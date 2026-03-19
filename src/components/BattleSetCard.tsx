@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { BattleSet, Battle } from "../types";
 import type { LeagueSchedule } from "../types";
 
@@ -13,6 +14,21 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
   const losses = battleSet.battles.filter((b) => b.won === false).length;
   const recorded = wins + losses;
 
+  const [setTeam, setSetTeam] = useState<[string, string, string]>(() => {
+    const first = battleSet.battles[0];
+    if (first && first.myTeam.some((m) => m !== "")) {
+      return [...first.myTeam] as [string, string, string];
+    }
+    return ["", "", ""];
+  });
+
+  const applyTeamToAll = () => {
+    onUpdate((s) => ({
+      ...s,
+      battles: s.battles.map((b) => ({ ...b, myTeam: [...setTeam] as [string, string, string] })),
+    }));
+  };
+
   const updateBattle = (battleId: string, patch: Partial<Battle>) => {
     onUpdate((s) => ({
       ...s,
@@ -22,30 +38,61 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
     }));
   };
 
+  const hasTeam = setTeam.some((m) => m !== "");
+
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
       {/* Set header */}
-      <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-          Set {battleSet.setNumber}
-        </h3>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">
-            <span className="text-green-600 dark:text-green-400">{wins}W</span>
-            {" - "}
-            <span className="text-red-600 dark:text-red-400">{losses}L</span>
-            {recorded > 0 && (
-              <span className="text-gray-400 ml-1">
-                ({Math.round((wins / recorded) * 100)}%)
-              </span>
-            )}
-          </span>
+      <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+            Set {battleSet.setNumber}
+          </h3>
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium">
+              <span className="text-green-600 dark:text-green-400">{wins}W</span>
+              {" - "}
+              <span className="text-red-600 dark:text-red-400">{losses}L</span>
+              {recorded > 0 && (
+                <span className="text-gray-400 ml-1">
+                  ({Math.round((wins / recorded) * 100)}%)
+                </span>
+              )}
+            </span>
+            <button
+              onClick={onDelete}
+              className="text-gray-400 hover:text-red-500 text-sm"
+              title="Delete set"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+
+        {/* Team template */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-gray-500 dark:text-gray-400 w-14 shrink-0">My team</span>
+          {setTeam.map((mon, i) => (
+            <input
+              key={i}
+              type="text"
+              value={mon}
+              onChange={(e) => {
+                const next = [...setTeam] as [string, string, string];
+                next[i] = e.target.value;
+                setSetTeam(next);
+              }}
+              placeholder={`Pokemon ${i + 1}`}
+              className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 placeholder:text-gray-300 dark:placeholder:text-gray-500"
+            />
+          ))}
           <button
-            onClick={onDelete}
-            className="text-gray-400 hover:text-red-500 text-sm"
-            title="Delete set"
+            onClick={applyTeamToAll}
+            disabled={!hasTeam}
+            className="shrink-0 px-2.5 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title="Apply this team to all battles in this set"
           >
-            &times;
+            Apply to all
           </button>
         </div>
       </div>
