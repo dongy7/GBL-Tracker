@@ -4,7 +4,20 @@ import { ActiveLeagues } from "./components/ActiveLeagues";
 import { BattleSetCard } from "./components/BattleSetCard";
 import { DaySummary } from "./components/DaySummary";
 import { useDay } from "./hooks/useDay";
+import { useTheme } from "./hooks/useTheme";
 import { getAvailableLeagues, SEASON_NAME } from "./leagues";
+
+const THEME_ICONS: Record<string, string> = {
+  light: "\u2600\uFE0F",
+  dark: "\uD83C\uDF19",
+  system: "\uD83D\uDCBB",
+};
+
+const THEME_LABELS: Record<string, string> = {
+  light: "Light",
+  dark: "Dark",
+  system: "System",
+};
 
 function todayString(): string {
   const d = new Date();
@@ -15,6 +28,7 @@ function App() {
   const [date, setDate] = useState(todayString);
   const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets } =
     useDay(date);
+  const { theme, cycle } = useTheme();
   const availableLeagues = getAvailableLeagues(date);
 
   return (
@@ -28,7 +42,16 @@ function App() {
               Season: {SEASON_NAME}
             </p>
           </div>
-          <DatePicker date={date} onChange={setDate} />
+          <div className="flex items-center gap-3">
+            <DatePicker date={date} onChange={setDate} />
+            <button
+              onClick={cycle}
+              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm transition-colors"
+              title={`Theme: ${THEME_LABELS[theme]}`}
+            >
+              {THEME_ICONS[theme]}
+            </button>
+          </div>
         </div>
       </header>
 
