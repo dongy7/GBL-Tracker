@@ -20,6 +20,7 @@ export interface DayRecord {
 
 export interface LeagueSchedule {
   name: string;
+  icon: string;
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
   cpLimit: number | null; // null = no limit (Master League)

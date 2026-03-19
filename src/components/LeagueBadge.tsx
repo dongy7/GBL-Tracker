@@ -30,6 +30,7 @@ export function LeagueBadge({ league }: Props) {
         .filter(Boolean)
         .join(" | ")}
     >
+      <img src={league.icon} alt="" className="w-4 h-4" />
       {league.name}
       {league.stardustBonus && <span title="4× Stardust">✦</span>}
     </span>
