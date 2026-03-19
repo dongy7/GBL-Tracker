@@ -1,3 +1,11 @@
+export type EloTier = "Ace" | "Veteran" | "Legend";
+
+export interface Rating {
+  type: "rank" | "elo";
+  value: number; // rank 1-20 or ELO rating
+  tier?: EloTier; // highest tier achieved — never demotes
+}
+
 export interface Battle {
   id: string;
   won: boolean | null; // null = not yet recorded
@@ -11,11 +19,13 @@ export interface BattleSet {
   date: string; // ISO date string YYYY-MM-DD
   setNumber: number; // 1-5 (or 1-10 on Thursdays)
   battles: Battle[];
+  endRating?: Rating; // rating after completing this set
 }
 
 export interface DayRecord {
   date: string;
   sets: BattleSet[];
+  startRating?: Rating; // rating at the start of the day
 }
 
 export interface LeagueSchedule {

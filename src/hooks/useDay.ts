@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import type { BattleSet, DayRecord } from "../types";
-import { loadDay, saveDay, createBattleSet } from "../storage";
+import type { BattleSet, DayRecord, Rating } from "../types";
+import { loadDay, loadPreviousDayRating, saveDay, createBattleSet } from "../storage";
 import { getMaxSets, getAvailableLeagues } from "../leagues";
 
 export function useDay(date: string) {
@@ -62,8 +62,18 @@ export function useDay(date: string) {
     [date, dayRecord, persist]
   );
 
+  const setStartRating = useCallback(
+    (rating: Rating) => {
+      persist({ ...dayRecord, startRating: rating });
+    },
+    [dayRecord, persist]
+  );
+
+  // Try to infer start rating from previous day's last set
+  const previousDayRating = loadPreviousDayRating(date);
+
   const maxSets = getMaxSets(date);
   const canAddSet = dayRecord.sets.length < maxSets;
 
-  return { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets };
+  return { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating };
 }

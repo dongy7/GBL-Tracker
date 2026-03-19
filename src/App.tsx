@@ -3,7 +3,9 @@ import { DatePicker } from "./components/DatePicker";
 import { ActiveLeagues } from "./components/ActiveLeagues";
 import { BattleSetCard } from "./components/BattleSetCard";
 import { DaySummary } from "./components/DaySummary";
+import { RatingInput } from "./components/RatingInput";
 import { useDay } from "./hooks/useDay";
+import type { Rating } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { getAvailableLeagues, SEASON_NAME } from "./leagues";
 
@@ -26,7 +28,7 @@ function todayString(): string {
 
 function App() {
   const [date, setDate] = useState(todayString);
-  const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets } =
+  const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating } =
     useDay(date);
   const { theme, cycle } = useTheme();
   const availableLeagues = getAvailableLeagues(date);
@@ -59,20 +61,36 @@ function App() {
         {/* Active leagues */}
         <ActiveLeagues leagues={availableLeagues} />
 
+        {/* Start rating */}
+        <RatingInput
+          rating={dayRecord.startRating ?? previousDayRating ?? undefined}
+          onChange={setStartRating}
+          label="Day start rating:"
+        />
+
         {/* Daily summary */}
         <DaySummary dayRecord={dayRecord} />
 
         {/* Battle sets */}
         <div className="space-y-4">
-          {dayRecord.sets.map((set) => (
-            <BattleSetCard
-              key={set.id}
-              battleSet={set}
-              availableLeagues={availableLeagues}
-              onUpdate={(updater) => updateSet(set.id, updater)}
-              onDelete={() => deleteSet(set.id)}
-            />
-          ))}
+          {dayRecord.sets.map((set, i) => {
+            // The "before" rating for this set is the previous set's endRating,
+            // or the day's startRating for the first set
+            const before: Rating | undefined =
+              i > 0
+                ? dayRecord.sets[i - 1].endRating
+                : (dayRecord.startRating ?? previousDayRating ?? undefined);
+            return (
+              <BattleSetCard
+                key={set.id}
+                battleSet={set}
+                availableLeagues={availableLeagues}
+                beforeRating={before}
+                onUpdate={(updater) => updateSet(set.id, updater)}
+                onDelete={() => deleteSet(set.id)}
+              />
+            );
+          })}
         </div>
 
         {/* Add set button */}

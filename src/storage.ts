@@ -1,4 +1,4 @@
-import type { BattleSet, DayRecord } from "./types";
+import type { BattleSet, DayRecord, Rating } from "./types";
 
 const STORAGE_KEY = "pogo-gbl-tracker";
 
@@ -17,6 +17,26 @@ export function saveDay(record: DayRecord): void {
   const all = loadAllData();
   all[record.date] = record;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+}
+
+export function loadPreviousDayRating(date: string): Rating | null {
+  const all = loadAllData();
+  // Find the most recent day before this date that has rating data
+  const previousDates = Object.keys(all)
+    .filter((d) => d < date)
+    .sort()
+    .reverse();
+
+  for (const d of previousDates) {
+    const record = all[d];
+    // Check last set's end rating first
+    for (let i = record.sets.length - 1; i >= 0; i--) {
+      if (record.sets[i].endRating) return record.sets[i].endRating!;
+    }
+    // Fall back to start rating
+    if (record.startRating) return record.startRating;
+  }
+  return null;
 }
 
 export function createBattleSet(

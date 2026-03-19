@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { BattleSet, Battle } from "../types";
+import type { BattleSet, Battle, Rating } from "../types";
 import type { LeagueSchedule } from "../types";
 import { PokemonInput } from "./PokemonInput";
+import { SetRatingInput } from "./SetRatingInput";
 
 const INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600";
 const HEADER_INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 placeholder:text-gray-300 dark:placeholder:text-gray-500";
@@ -9,11 +10,12 @@ const HEADER_INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-300 dark
 interface Props {
   battleSet: BattleSet;
   availableLeagues: LeagueSchedule[];
+  beforeRating?: Rating;
   onUpdate: (updater: (s: BattleSet) => BattleSet) => void;
   onDelete: () => void;
 }
 
-export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete }: Props) {
+export function BattleSetCard({ battleSet, availableLeagues, beforeRating, onUpdate, onDelete }: Props) {
   const wins = battleSet.battles.filter((b) => b.won === true).length;
   const losses = battleSet.battles.filter((b) => b.won === false).length;
   const recorded = wins + losses;
@@ -112,6 +114,19 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
           />
         ))}
       </div>
+
+      {/* Rating after set */}
+      {beforeRating && (
+        <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+          <SetRatingInput
+            beforeRating={beforeRating}
+            endRating={battleSet.endRating}
+            onSave={(rating) =>
+              onUpdate((s) => ({ ...s, endRating: rating }))
+            }
+          />
+        </div>
+      )}
     </div>
   );
 }
