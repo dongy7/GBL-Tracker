@@ -11,6 +11,8 @@ A web app for tracking your Pokemon Go Battle League sets, teams, and rating pro
 - **Rating progression** — Track rank (1-20) or ELO rating throughout the day with per-set deltas
 - **Permanent tier tracking** — Ace (2000+), Veteran (2500+), and Legend (3000+) tiers are preserved even if ELO drops
 - **Daily summaries** — Win rate stats with per-league breakdowns and visual progress bar
+- **Reports page** — Overall battle stats, ELO progression chart with tier milestones, and opponent Pokemon usage stats grouped by league
+- **Data export/import** — Back up your data as JSON and restore it on any device
 - **Light/dark mode** — Toggle between light, dark, and system themes
 - **Local persistence** — All data saved to localStorage
 
