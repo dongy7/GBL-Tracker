@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { POKEMON_NAMES } from "../pokemon";
 
+const SHADOW_PREFIX = "Shadow ";
+
+function parseShadow(value: string): { name: string; shadow: boolean } {
+  if (value.startsWith(SHADOW_PREFIX)) {
+    return { name: value.slice(SHADOW_PREFIX.length), shadow: true };
+  }
+  return { name: value, shadow: false };
+}
+
 interface Props {
   value: string;
   onChange: (value: string) => void;
@@ -9,7 +18,9 @@ interface Props {
 }
 
 export function PokemonInput({ value, onChange, placeholder, className }: Props) {
-  const [query, setQuery] = useState(value);
+  const parsed = parseShadow(value);
+  const [query, setQuery] = useState(parsed.name);
+  const [shadow, setShadow] = useState(parsed.shadow);
   const [open, setOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,8 +28,18 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
 
   // Sync external value changes
   useEffect(() => {
-    setQuery(value);
+    const p = parseShadow(value);
+    setQuery(p.name);
+    setShadow(p.shadow);
   }, [value]);
+
+  const emit = useCallback((name: string, isShadow: boolean) => {
+    if (!name) {
+      onChange("");
+      return;
+    }
+    onChange(isShadow ? SHADOW_PREFIX + name : name);
+  }, [onChange]);
 
   const matches = open && query.length >= 1
     ? POKEMON_NAMES.filter((n) =>
@@ -28,9 +49,9 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
 
   const select = useCallback((name: string) => {
     setQuery(name);
-    onChange(name);
+    emit(name, shadow);
     setOpen(false);
-  }, [onChange]);
+  }, [emit, shadow]);
 
   const handleChange = (text: string) => {
     setQuery(text);
@@ -39,6 +60,12 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
     if (text === "") {
       onChange("");
     }
+  };
+
+  const toggleShadow = () => {
+    const next = !shadow;
+    setShadow(next);
+    emit(query, next);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -78,37 +105,52 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
   }, []);
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-0">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => handleChange(e.target.value)}
-        onFocus={() => { if (query.length >= 1) setOpen(true); }}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        className={className}
-      />
-      {open && matches.length > 0 && (
-        <ul
-          ref={listRef}
-          className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg max-h-48 overflow-y-auto text-xs"
-        >
-          {matches.map((name, i) => (
-            <li
-              key={name}
-              onMouseDown={() => select(name)}
-              onMouseEnter={() => setHighlightIndex(i)}
-              className={`px-2 py-1.5 cursor-pointer ${
-                i === highlightIndex
-                  ? "bg-blue-500 text-white"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-              }`}
-            >
-              {name}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div ref={containerRef} className="relative flex-1 min-w-0 flex gap-0.5">
+      <button
+        type="button"
+        onClick={toggleShadow}
+        title={shadow ? "Shadow (click to toggle)" : "Normal (click to toggle)"}
+        className={`shrink-0 w-5 h-5 rounded text-[9px] font-bold leading-none flex items-center justify-center transition-colors ${
+          shadow
+            ? "bg-purple-600 text-white"
+            : "bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600 hover:text-purple-400"
+        }`}
+      >
+        S
+      </button>
+      <div className="relative flex-1 min-w-0">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleChange(e.target.value)}
+          onFocus={() => { if (query.length >= 1) setOpen(true); }}
+          onBlur={() => { if (query && !value) emit(query, shadow); }}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className={className}
+        />
+        {open && matches.length > 0 && (
+          <ul
+            ref={listRef}
+            className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg max-h-48 overflow-y-auto text-xs"
+          >
+            {matches.map((name, i) => (
+              <li
+                key={name}
+                onMouseDown={() => select(name)}
+                onMouseEnter={() => setHighlightIndex(i)}
+                className={`px-2 py-1.5 cursor-pointer ${
+                  i === highlightIndex
+                    ? "bg-blue-500 text-white"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
