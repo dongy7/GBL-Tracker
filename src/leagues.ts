@@ -5,15 +5,15 @@ export const SEASON_START = "2026-03-03";
 export const SEASON_END = "2026-06-02";
 
 const ICONS = {
-  great: "https://lh3.googleusercontent.com/Hgk6QkWUrAhjCXsFJW5WB9Q-dXfP4NcBfo_YVCgJ-7ba9UOvRmA1AQ5dEffKfHg08SBWQ9d8q9y-h0UCRzVJ9WBVCaPqjJVm9DQU2DmvTXm5iw=s0-e365",
-  ultra: "https://lh3.googleusercontent.com/QRlL4u97DNh1aLsVR7QsUW8QfpMZpLYTnmLzVsVvY67k0CB82H3KWrgPr2L1fq1vxccU03fDFrNmHkVDzJAEwwBJ6xLOcvVtMZr7wSFdSuMePg=s0-e365",
-  master: "https://lh3.googleusercontent.com/QtzKglb_31f_XozFiyaDzd3hBdZoSe8HDJ0901Jk6sNEqB920hqaiRNhnBL0ieyp-7wccca6KXjm52fTttVexcEHnhRDRf6DtdD55FpNfufdMA=s0-e365",
-  kanto: "https://lh3.googleusercontent.com/hsf25XV15PtzqJA_4_N1MZsUcijmXSnmyZzAbrtq9JMxIHkDtBieEF_kV5GBbjiB0i02WTINvAye6O29qqfkibaBtvQ8fchphkY=s0-e365",
-  spring: "https://lh3.googleusercontent.com/dbypUPCcvMZB_HEv58qDwX915uN5NWwJnaPsbHiItkWk4Rgnbiig1dXrSLZHL80upFc4ubnWA6asqI9w9oiB0FDV8tz8SZYwgpb2=s0-e365",
-  jungle: "https://lh3.googleusercontent.com/zu5WzS7dAd3GTUSosliLYpinIWEtS_DuDTk7J5FGaV9ueUfClC_ZnaQBBZe_RiwqEMxgMAeYNaUrxTGJqZ55GTIqeZ7fbvSRp14=s0-e365",
-  electric: "https://lh3.googleusercontent.com/1pMPCj4BGfmMG4r0ZV65TvgFhumT1bvN_G7AU6NY5Jdzl9H0uQ32U8uPg7EMYgA7GHhg8V5L66tVswde_ZAwqj4OpedcFdnxN2k=s0-e365",
-  fantasy: "https://lh3.googleusercontent.com/-iI4G9-RtK7w48TtZRL1u-xzNwTtaWj6iY0GepeZRFWj5gS2L9XjqGpugfwKWKHnTUv1vYi2LmiUXNNRjkH61V3gNA3AfQt7jt00=s0-e365",
-  catch: "https://lh3.googleusercontent.com/tn5cdJ4ubmTt3ZKaNnLj1EK9Ksuk-wDOhiV9lMQSnNVfN3bNwhk8PUvlb5Jk2751pz0wmim0O4KRKucMG9S12idX1ONsmHowQzk=s0-e365",
+  great: "/icons/leagues/great.png",
+  ultra: "/icons/leagues/ultra.png",
+  master: "/icons/leagues/master.png",
+  kanto: "/icons/leagues/kanto.png",
+  spring: "/icons/leagues/spring.png",
+  jungle: "/icons/leagues/jungle.png",
+  electric: "/icons/leagues/electric.png",
+  fantasy: "/icons/leagues/fantasy.png",
+  catch: "/icons/leagues/catch.png",
 };
 
 export const LEAGUE_SCHEDULES: LeagueSchedule[] = [
