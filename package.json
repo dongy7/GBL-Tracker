@@ -1,5 +1,6 @@
 {
-  "name": "pogo",
+  "name": "gbl-tracker",
+  "description": "Track your Pokemon Go Battle League sets, teams, and rating progression",
   "private": true,
   "version": "0.0.0",
   "type": "module",
