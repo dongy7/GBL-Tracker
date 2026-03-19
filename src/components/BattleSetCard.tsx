@@ -22,33 +22,13 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
     }));
   };
 
-  const setLeagueForAll = (league: string) => {
-    onUpdate((s) => ({
-      ...s,
-      battles: s.battles.map((b) => ({ ...b, league })),
-    }));
-  };
-
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
       {/* Set header */}
       <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-            Set {battleSet.setNumber}
-          </h3>
-          <select
-            value={battleSet.battles[0]?.league ?? ""}
-            onChange={(e) => setLeagueForAll(e.target.value)}
-            className="text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
-          >
-            {availableLeagues.map((l, i) => (
-              <option key={i} value={l.name}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+          Set {battleSet.setNumber}
+        </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium">
             <span className="text-green-600 dark:text-green-400">{wins}W</span>
@@ -77,6 +57,7 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
             key={battle.id}
             battle={battle}
             index={i + 1}
+            availableLeagues={availableLeagues}
             onUpdate={(patch) => updateBattle(battle.id, patch)}
           />
         ))}
@@ -88,10 +69,11 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
 interface BattleRowProps {
   battle: Battle;
   index: number;
+  availableLeagues: LeagueSchedule[];
   onUpdate: (patch: Partial<Battle>) => void;
 }
 
-function BattleRow({ battle, index, onUpdate }: BattleRowProps) {
+function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps) {
   const updateTeamMember = (
     team: "myTeam" | "opponentTeam",
     idx: number,
@@ -106,6 +88,19 @@ function BattleRow({ battle, index, onUpdate }: BattleRowProps) {
     <div className="px-4 py-2.5 flex items-center gap-3 text-sm">
       {/* Battle number */}
       <span className="text-gray-400 w-6 text-center font-mono">{index}</span>
+
+      {/* League selector */}
+      <select
+        value={battle.league}
+        onChange={(e) => onUpdate({ league: e.target.value })}
+        className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 max-w-32 truncate"
+      >
+        {availableLeagues.map((l, i) => (
+          <option key={i} value={l.name}>
+            {l.name}
+          </option>
+        ))}
+      </select>
 
       {/* Win/Loss buttons */}
       <div className="flex gap-1">
