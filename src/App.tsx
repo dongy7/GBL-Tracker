@@ -4,6 +4,7 @@ import { ActiveLeagues } from "./components/ActiveLeagues";
 import { BattleSetCard } from "./components/BattleSetCard";
 import { DaySummary } from "./components/DaySummary";
 import { RatingInput } from "./components/RatingInput";
+import ReportPage from "./components/ReportPage";
 import { useDay } from "./hooks/useDay";
 import type { Rating } from "./types";
 import { useTheme } from "./hooks/useTheme";
@@ -28,6 +29,7 @@ function todayString(): string {
 }
 
 function App() {
+  const [page, setPage] = useState<"tracker" | "report">("tracker");
   const [date, setDate] = useState(todayString);
   const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating } =
     useDay(date);
@@ -68,11 +70,35 @@ function App() {
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-800 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">GBL Tracker</h1>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Season: {SEASON_NAME}
-            </p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-xl font-bold">GBL Tracker</h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Season: {SEASON_NAME}
+              </p>
+            </div>
+            <nav className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 ml-4">
+              <button
+                onClick={() => setPage("tracker")}
+                className={`px-3 py-1.5 text-xs font-medium ${
+                  page === "tracker"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                Tracker
+              </button>
+              <button
+                onClick={() => setPage("report")}
+                className={`px-3 py-1.5 text-xs font-medium ${
+                  page === "report"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                Reports
+              </button>
+            </nav>
           </div>
           <div className="flex items-center gap-3">
             <DatePicker date={date} onChange={setDate} />
@@ -108,53 +134,57 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Active leagues */}
-        <ActiveLeagues leagues={availableLeagues} />
+      {page === "tracker" ? (
+        <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+          {/* Active leagues */}
+          <ActiveLeagues leagues={availableLeagues} />
 
-        {/* Start rating */}
-        <RatingInput
-          rating={dayRecord.startRating ?? previousDayRating ?? undefined}
-          onChange={setStartRating}
-          label="Day start rating:"
-        />
+          {/* Start rating */}
+          <RatingInput
+            rating={dayRecord.startRating ?? previousDayRating ?? undefined}
+            onChange={setStartRating}
+            label="Day start rating:"
+          />
 
-        {/* Daily summary */}
-        <DaySummary dayRecord={dayRecord} />
+          {/* Daily summary */}
+          <DaySummary dayRecord={dayRecord} />
 
-        {/* Battle sets */}
-        <div className="space-y-4">
-          {dayRecord.sets.map((set, i) => {
-            // The "before" rating for this set is the previous set's endRating,
-            // or the day's startRating for the first set
-            const before: Rating | undefined =
-              i > 0
-                ? dayRecord.sets[i - 1].endRating
-                : (dayRecord.startRating ?? previousDayRating ?? undefined);
-            return (
-              <BattleSetCard
-                key={set.id}
-                battleSet={set}
-                availableLeagues={availableLeagues}
-                beforeRating={before}
-                onUpdate={(updater) => updateSet(set.id, updater)}
-                onDelete={() => deleteSet(set.id)}
-              />
-            );
-          })}
-        </div>
+          {/* Battle sets */}
+          <div className="space-y-4">
+            {dayRecord.sets.map((set, i) => {
+              // The "before" rating for this set is the previous set's endRating,
+              // or the day's startRating for the first set
+              const before: Rating | undefined =
+                i > 0
+                  ? dayRecord.sets[i - 1].endRating
+                  : (dayRecord.startRating ?? previousDayRating ?? undefined);
+              return (
+                <BattleSetCard
+                  key={set.id}
+                  battleSet={set}
+                  availableLeagues={availableLeagues}
+                  beforeRating={before}
+                  onUpdate={(updater) => updateSet(set.id, updater)}
+                  onDelete={() => deleteSet(set.id)}
+                />
+              );
+            })}
+          </div>
 
-        {/* Add set button */}
-        {availableLeagues.length > 0 && (
-          <button
-            onClick={addSet}
-            disabled={!canAddSet}
-            className="w-full py-3 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            + Add Set ({dayRecord.sets.length}/{maxSets})
-          </button>
-        )}
-      </main>
+          {/* Add set button */}
+          {availableLeagues.length > 0 && (
+            <button
+              onClick={addSet}
+              disabled={!canAddSet}
+              className="w-full py-3 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-blue-400 hover:text-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              + Add Set ({dayRecord.sets.length}/{maxSets})
+            </button>
+          )}
+        </main>
+      ) : (
+        <ReportPage />
+      )}
     </div>
   );
 }
