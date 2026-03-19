@@ -39,6 +39,18 @@ export function loadPreviousDayRating(date: string): Rating | null {
   return null;
 }
 
+export function exportData(): string {
+  return localStorage.getItem(STORAGE_KEY) ?? "{}";
+}
+
+export function importData(json: string): void {
+  const parsed = JSON.parse(json); // throws on invalid JSON
+  if (typeof parsed !== "object" || parsed === null) {
+    throw new Error("Invalid data format");
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+}
+
 export function createBattleSet(
   date: string,
   setNumber: number,

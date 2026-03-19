@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { DatePicker } from "./components/DatePicker";
 import { ActiveLeagues } from "./components/ActiveLeagues";
 import { BattleSetCard } from "./components/BattleSetCard";
@@ -8,6 +8,7 @@ import { useDay } from "./hooks/useDay";
 import type { Rating } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { getAvailableLeagues, SEASON_NAME } from "./leagues";
+import { exportData, importData } from "./storage";
 
 const THEME_ICONS: Record<string, string> = {
   light: "\u2600\uFE0F",
@@ -32,6 +33,35 @@ function App() {
     useDay(date);
   const { theme, cycle } = useTheme();
   const availableLeagues = getAvailableLeagues(date);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    const json = exportData();
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gbl-tracker-${todayString()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        importData(reader.result as string);
+        window.location.reload();
+      } catch {
+        alert("Invalid data file.");
+      }
+    };
+    reader.readAsText(file);
+    // Reset so the same file can be re-imported
+    e.target.value = "";
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -46,6 +76,27 @@ function App() {
           </div>
           <div className="flex items-center gap-3">
             <DatePicker date={date} onChange={setDate} />
+            <button
+              onClick={handleExport}
+              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
+              title="Export data"
+            >
+              Export
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
+              title="Import data"
+            >
+              Import
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+            />
             <button
               onClick={cycle}
               className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm transition-colors"
