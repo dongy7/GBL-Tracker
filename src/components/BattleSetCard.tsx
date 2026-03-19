@@ -16,9 +16,10 @@ interface Props {
 }
 
 export function BattleSetCard({ battleSet, availableLeagues, beforeRating, onUpdate, onDelete }: Props) {
-  const wins = battleSet.battles.filter((b) => b.won === true).length;
-  const losses = battleSet.battles.filter((b) => b.won === false).length;
-  const recorded = wins + losses;
+  const wins = battleSet.battles.filter((b) => b.result === "win").length;
+  const losses = battleSet.battles.filter((b) => b.result === "loss").length;
+  const draws = battleSet.battles.filter((b) => b.result === "draw").length;
+  const recorded = wins + losses + draws;
 
   const [setTeam, setSetTeam] = useState<[string, string, string]>(() => {
     const first = battleSet.battles[0];
@@ -59,6 +60,12 @@ export function BattleSetCard({ battleSet, availableLeagues, beforeRating, onUpd
               <span className="text-green-600 dark:text-green-400">{wins}W</span>
               {" - "}
               <span className="text-red-600 dark:text-red-400">{losses}L</span>
+              {draws > 0 && (
+                <>
+                  {" - "}
+                  <span className="text-yellow-600 dark:text-yellow-400">{draws}D</span>
+                </>
+              )}
               {recorded > 0 && (
                 <span className="text-gray-400 ml-1">
                   ({Math.round((wins / recorded) * 100)}%)
@@ -169,9 +176,9 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
 
         <div className="flex gap-1 shrink-0 ml-auto">
           <button
-            onClick={() => onUpdate({ won: battle.won === true ? null : true })}
+            onClick={() => onUpdate({ result: battle.result === "win" ? null : "win" })}
             className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
-              battle.won === true
+              battle.result === "win"
                 ? "bg-green-500 text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-green-100 dark:hover:bg-green-900"
             }`}
@@ -179,14 +186,24 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
             W
           </button>
           <button
-            onClick={() => onUpdate({ won: battle.won === false ? null : false })}
+            onClick={() => onUpdate({ result: battle.result === "loss" ? null : "loss" })}
             className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
-              battle.won === false
+              battle.result === "loss"
                 ? "bg-red-500 text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-red-100 dark:hover:bg-red-900"
             }`}
           >
             L
+          </button>
+          <button
+            onClick={() => onUpdate({ result: battle.result === "draw" ? null : "draw" })}
+            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+              battle.result === "draw"
+                ? "bg-yellow-500 text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-yellow-100 dark:hover:bg-yellow-900"
+            }`}
+          >
+            D
           </button>
         </div>
       </div>

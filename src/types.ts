@@ -6,9 +6,11 @@ export interface Rating {
   tier?: EloTier; // highest tier achieved — never demotes
 }
 
+export type BattleResult = "win" | "loss" | "draw" | null;
+
 export interface Battle {
   id: string;
-  won: boolean | null; // null = not yet recorded
+  result: BattleResult; // null = not yet recorded
   league: string;
   myTeam: [string, string, string];
   opponentTeam: [string, string, string];

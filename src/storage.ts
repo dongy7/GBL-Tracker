@@ -50,7 +50,7 @@ export function createBattleSet(
     setNumber,
     battles: Array.from({ length: 5 }, (_, i) => ({
       id: `${date}-set-${setNumber}-battle-${i + 1}`,
-      won: null,
+      result: null,
       league,
       myTeam: ["", "", ""],
       opponentTeam: ["", "", ""],
