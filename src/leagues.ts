@@ -4,16 +4,18 @@ export const SEASON_NAME = "Memories in Motion";
 export const SEASON_START = "2026-03-03";
 export const SEASON_END = "2026-06-02";
 
+const base = import.meta.env.BASE_URL;
+
 const ICONS = {
-  great: "/icons/leagues/great.png",
-  ultra: "/icons/leagues/ultra.png",
-  master: "/icons/leagues/master.png",
-  kanto: "/icons/leagues/kanto.png",
-  spring: "/icons/leagues/spring.png",
-  jungle: "/icons/leagues/jungle.png",
-  electric: "/icons/leagues/electric.png",
-  fantasy: "/icons/leagues/fantasy.png",
-  catch: "/icons/leagues/catch.png",
+  great: `${base}icons/leagues/great.png`,
+  ultra: `${base}icons/leagues/ultra.png`,
+  master: `${base}icons/leagues/master.png`,
+  kanto: `${base}icons/leagues/kanto.png`,
+  spring: `${base}icons/leagues/spring.png`,
+  jungle: `${base}icons/leagues/jungle.png`,
+  electric: `${base}icons/leagues/electric.png`,
+  fantasy: `${base}icons/leagues/fantasy.png`,
+  catch: `${base}icons/leagues/catch.png`,
 };
 
 export const LEAGUE_SCHEDULES: LeagueSchedule[] = [
