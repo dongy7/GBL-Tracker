@@ -85,65 +85,65 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
   };
 
   return (
-    <div className="px-4 py-2.5 flex items-center gap-3 text-sm">
-      {/* Battle number */}
-      <span className="text-gray-400 w-6 text-center font-mono">{index}</span>
+    <div className="px-4 py-2.5 space-y-1.5 text-sm">
+      {/* Row 1: battle number, league, W/L */}
+      <div className="flex items-center gap-2">
+        <span className="text-gray-400 w-5 shrink-0 text-center font-mono text-xs">{index}</span>
 
-      {/* League selector */}
-      <select
-        value={battle.league}
-        onChange={(e) => onUpdate({ league: e.target.value })}
-        className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 max-w-32 truncate"
-      >
-        {availableLeagues.map((l, i) => (
-          <option key={i} value={l.name}>
-            {l.name}
-          </option>
-        ))}
-      </select>
+        <select
+          value={battle.league}
+          onChange={(e) => onUpdate({ league: e.target.value })}
+          className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 w-auto shrink-0"
+        >
+          {availableLeagues.map((l, i) => (
+            <option key={i} value={l.name}>
+              {l.name}
+            </option>
+          ))}
+        </select>
 
-      {/* Win/Loss buttons */}
-      <div className="flex gap-1">
-        <button
-          onClick={() => onUpdate({ won: battle.won === true ? null : true })}
-          className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
-            battle.won === true
-              ? "bg-green-500 text-white"
-              : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-green-100 dark:hover:bg-green-900"
-          }`}
-        >
-          W
-        </button>
-        <button
-          onClick={() => onUpdate({ won: battle.won === false ? null : false })}
-          className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
-            battle.won === false
-              ? "bg-red-500 text-white"
-              : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-red-100 dark:hover:bg-red-900"
-          }`}
-        >
-          L
-        </button>
+        <div className="flex gap-1 shrink-0 ml-auto">
+          <button
+            onClick={() => onUpdate({ won: battle.won === true ? null : true })}
+            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+              battle.won === true
+                ? "bg-green-500 text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-green-100 dark:hover:bg-green-900"
+            }`}
+          >
+            W
+          </button>
+          <button
+            onClick={() => onUpdate({ won: battle.won === false ? null : false })}
+            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+              battle.won === false
+                ? "bg-red-500 text-white"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-red-100 dark:hover:bg-red-900"
+            }`}
+          >
+            L
+          </button>
+        </div>
       </div>
 
-      {/* My team */}
-      <div className="flex-1 flex gap-1">
+      {/* Row 2: my team */}
+      <div className="flex items-center gap-1.5 pl-7">
+        <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Me</span>
         {battle.myTeam.map((mon, i) => (
           <input
             key={i}
             type="text"
             value={mon}
             onChange={(e) => updateTeamMember("myTeam", i, e.target.value)}
-            placeholder={`My #${i + 1}`}
+            placeholder={`Pokemon ${i + 1}`}
             className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600"
           />
         ))}
       </div>
 
-      <span className="text-gray-300 dark:text-gray-600 text-xs">vs</span>
-
-      {/* Opponent team */}
-      <div className="flex-1 flex gap-1">
+      {/* Row 3: opponent team */}
+      <div className="flex items-center gap-1.5 pl-7">
+        <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Opp</span>
         {battle.opponentTeam.map((mon, i) => (
           <input
             key={i}
@@ -152,7 +152,7 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
             onChange={(e) =>
               updateTeamMember("opponentTeam", i, e.target.value)
             }
-            placeholder={`Opp #${i + 1}`}
+            placeholder={`Pokemon ${i + 1}`}
             className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600"
           />
         ))}
