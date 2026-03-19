@@ -1,6 +1,10 @@
 import { useState } from "react";
 import type { BattleSet, Battle } from "../types";
 import type { LeagueSchedule } from "../types";
+import { PokemonInput } from "./PokemonInput";
+
+const INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600";
+const HEADER_INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 placeholder:text-gray-300 dark:placeholder:text-gray-500";
 
 interface Props {
   battleSet: BattleSet;
@@ -41,7 +45,7 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
   const hasTeam = setTeam.some((m) => m !== "");
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
       {/* Set header */}
       <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
         <div className="flex items-center justify-between">
@@ -73,17 +77,16 @@ export function BattleSetCard({ battleSet, availableLeagues, onUpdate, onDelete 
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-gray-500 dark:text-gray-400 w-14 shrink-0">My team</span>
           {setTeam.map((mon, i) => (
-            <input
+            <PokemonInput
               key={i}
-              type="text"
               value={mon}
-              onChange={(e) => {
+              onChange={(v) => {
                 const next = [...setTeam] as [string, string, string];
-                next[i] = e.target.value;
+                next[i] = v;
                 setSetTeam(next);
               }}
               placeholder={`Pokemon ${i + 1}`}
-              className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 placeholder:text-gray-300 dark:placeholder:text-gray-500"
+              className={HEADER_INPUT_CLASS}
             />
           ))}
           <button
@@ -177,13 +180,12 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
       <div className="flex items-center gap-1.5 pl-7">
         <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Me</span>
         {battle.myTeam.map((mon, i) => (
-          <input
+          <PokemonInput
             key={i}
-            type="text"
             value={mon}
-            onChange={(e) => updateTeamMember("myTeam", i, e.target.value)}
+            onChange={(v) => updateTeamMember("myTeam", i, v)}
             placeholder={`Pokemon ${i + 1}`}
-            className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600"
+            className={INPUT_CLASS}
           />
         ))}
       </div>
@@ -192,15 +194,12 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
       <div className="flex items-center gap-1.5 pl-7">
         <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Opp</span>
         {battle.opponentTeam.map((mon, i) => (
-          <input
+          <PokemonInput
             key={i}
-            type="text"
             value={mon}
-            onChange={(e) =>
-              updateTeamMember("opponentTeam", i, e.target.value)
-            }
+            onChange={(v) => updateTeamMember("opponentTeam", i, v)}
             placeholder={`Pokemon ${i + 1}`}
-            className="flex-1 min-w-0 px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600"
+            className={INPUT_CLASS}
           />
         ))}
       </div>
