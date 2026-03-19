@@ -14,6 +14,7 @@ export interface Battle {
   league: string;
   myTeam: [string, string, string];
   opponentTeam: [string, string, string];
+  opponentId?: string;
 }
 
 export interface BattleSet {

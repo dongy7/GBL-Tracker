@@ -222,7 +222,7 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
         ))}
       </div>
 
-      {/* Row 3: opponent team */}
+      {/* Row 3: opponent team + player ID */}
       <div className="flex items-center gap-1.5 pl-7">
         <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Opp</span>
         {battle.opponentTeam.map((mon, i) => (
@@ -234,6 +234,13 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
             className={INPUT_CLASS}
           />
         ))}
+        <input
+          type="text"
+          value={battle.opponentId ?? ""}
+          onChange={(e) => onUpdate({ opponentId: e.target.value || undefined })}
+          placeholder="Player ID"
+          className={`${INPUT_CLASS} max-w-24`}
+        />
       </div>
     </div>
   );
