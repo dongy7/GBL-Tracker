@@ -31,6 +31,8 @@ export default function ReportPage() {
 
     // Pokemon usage: league -> pokemon name -> stats
     const pokemonByLeague: Record<string, Record<string, PokemonStat>> = {};
+    // Lead tracking: league -> pokemon name -> stats
+    const leadsByLeague: Record<string, Record<string, PokemonStat>> = {};
     const leaguesUsed = new Set<string>();
 
     for (const day of days) {
@@ -78,6 +80,20 @@ export default function ReportPage() {
             else if (battle.result === "loss") leagueStats[pokemon].losses++;
             else if (battle.result === "draw") leagueStats[pokemon].draws++;
           }
+
+          // Track opponent leads
+          const lead = battle.opponentTeam[0];
+          if (lead) {
+            if (!leadsByLeague[league]) leadsByLeague[league] = {};
+            const leagueLeads = leadsByLeague[league];
+            if (!leagueLeads[lead]) {
+              leagueLeads[lead] = { name: lead, used: 0, wins: 0, losses: 0, draws: 0 };
+            }
+            leagueLeads[lead].used++;
+            if (battle.result === "win") leagueLeads[lead].wins++;
+            else if (battle.result === "loss") leagueLeads[lead].losses++;
+            else if (battle.result === "draw") leagueLeads[lead].draws++;
+          }
         }
 
         // Collect ELO from endRating
@@ -107,6 +123,15 @@ export default function ReportPage() {
       pokemonUsage.push({ league, pokemon: sorted });
     }
 
+    // Build sorted lead lists per league
+    const leadUsage: { league: string; pokemon: PokemonStat[] }[] = [];
+    for (const league of Array.from(leaguesUsed).sort()) {
+      const leagueLeads = leadsByLeague[league];
+      if (!leagueLeads) continue;
+      const sorted = Object.values(leagueLeads).sort((a, b) => b.used - a.used);
+      leadUsage.push({ league, pokemon: sorted });
+    }
+
     return {
       totalBattles,
       wins,
@@ -119,6 +144,7 @@ export default function ReportPage() {
       currentRating,
       peakRating,
       pokemonUsage,
+      leadUsage,
       hasMultipleLeagues: leaguesUsed.size > 1,
     };
   }, []);
@@ -135,6 +161,7 @@ export default function ReportPage() {
     currentRating,
     peakRating,
     pokemonUsage,
+    leadUsage,
     hasMultipleLeagues,
   } = stats;
 
@@ -240,7 +267,72 @@ export default function ReportPage() {
         </div>
       )}
 
-      {/* Section 3: Pokemon Usage */}
+      {/* Section 3: Opponent Leads */}
+      {leadUsage.length > 0 && (
+        <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-5 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+            Opponent Leads
+          </h2>
+
+          {leadUsage.map(({ league, pokemon }) => (
+            <div key={league} className="space-y-2">
+              {hasMultipleLeagues && (
+                <h3 className="text-md font-medium text-gray-700 dark:text-gray-300">
+                  {league}
+                </h3>
+              )}
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                      <th className="pb-2 pr-4">Lead</th>
+                      <th className="pb-2 pr-4 text-right">Seen</th>
+                      <th className="pb-2 pr-4 text-right">W</th>
+                      <th className="pb-2 pr-4 text-right">L</th>
+                      <th className="pb-2 text-right">Win %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pokemon.slice(0, 10).map((p) => {
+                      const totalWithResult = p.wins + p.losses + p.draws;
+                      const pWinRate =
+                        totalWithResult > 0
+                          ? ((p.wins / totalWithResult) * 100).toFixed(1)
+                          : "-";
+                      return (
+                        <tr
+                          key={p.name}
+                          className="border-b border-gray-100 dark:border-gray-800"
+                        >
+                          <td className="py-1.5 pr-4 text-gray-900 dark:text-gray-100">
+                            {p.name}
+                          </td>
+                          <td className="py-1.5 pr-4 text-right text-gray-600 dark:text-gray-400">
+                            {p.used}
+                          </td>
+                          <td className="py-1.5 pr-4 text-right text-green-600 dark:text-green-400">
+                            {p.wins}
+                          </td>
+                          <td className="py-1.5 pr-4 text-right text-red-600 dark:text-red-400">
+                            {p.losses}
+                          </td>
+                          <td className="py-1.5 text-right text-gray-700 dark:text-gray-300">
+                            {pWinRate}
+                            {pWinRate !== "-" ? "%" : ""}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Section 4: Pokemon Usage */}
       {pokemonUsage.length > 0 && (
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-5 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
