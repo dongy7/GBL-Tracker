@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import type { DayRecord, Rating } from "../types";
+import type { Rating } from "../types";
 import { loadAllData } from "../storage";
 import { formatRating, effectiveTier } from "../rating";
 import EloChart from "./EloChart";
