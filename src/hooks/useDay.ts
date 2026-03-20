@@ -1,24 +1,28 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import type { BattleSet, DayRecord, Rating } from "../types";
 import { loadDay, loadPreviousDayRating, saveDay, createBattleSet } from "../storage";
 import { getMaxSets, getAvailableLeagues } from "../leagues";
 
-export function useDay(date: string) {
-  const [dayRecord, setDayRecord] = useState<DayRecord>(() => {
-    const existing = loadDay(date);
-    if (existing) return existing;
-    return { date, sets: [] };
-  });
+function loadOrCreate(date: string): DayRecord {
+  return loadDay(date) ?? { date, sets: [] };
+}
 
-  // Reload when date changes
-  useEffect(() => {
-    const existing = loadDay(date);
-    setDayRecord(existing ?? { date, sets: [] });
-  }, [date]);
+export function useDay(date: string) {
+  const [state, setState] = useState(() => ({
+    date,
+    record: loadOrCreate(date),
+  }));
+
+  // If the date prop changed, reset synchronously during render
+  let dayRecord = state.record;
+  if (state.date !== date) {
+    dayRecord = loadOrCreate(date);
+    setState({ date, record: dayRecord });
+  }
 
   const persist = useCallback(
     (updated: DayRecord) => {
-      setDayRecord(updated);
+      setState((s) => ({ ...s, record: updated }));
       saveDay(updated);
     },
     []
@@ -51,7 +55,6 @@ export function useDay(date: string) {
   const deleteSet = useCallback(
     (setId: string) => {
       const filtered = dayRecord.sets.filter((s) => s.id !== setId);
-      // Renumber
       const renumbered = filtered.map((s, i) => ({
         ...s,
         setNumber: i + 1,
@@ -69,7 +72,6 @@ export function useDay(date: string) {
     [dayRecord, persist]
   );
 
-  // Try to infer start rating from previous day's last set
   const previousDayRating = loadPreviousDayRating(date);
 
   const maxSets = getMaxSets(date);

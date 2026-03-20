@@ -7,6 +7,7 @@ const LEAGUE_COLORS: Record<string, string> = {
   "Master League": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getLeagueColor(name: string): string {
   for (const [key, val] of Object.entries(LEAGUE_COLORS)) {
     if (name.includes(key.split(" ")[0])) return val;
@@ -14,6 +15,7 @@ export function getLeagueColor(name: string): string {
   return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getLeagueIcon(name: string): string | undefined {
   return LEAGUE_SCHEDULES.find((l) => l.name === name)?.icon;
 }

@@ -18,20 +18,26 @@ interface Props {
 }
 
 export function PokemonInput({ value, onChange, placeholder, className }: Props) {
-  const parsed = parseShadow(value);
-  const [query, setQuery] = useState(parsed.name);
-  const [shadow, setShadow] = useState(parsed.shadow);
+  const [state, setState] = useState(() => {
+    const p = parseShadow(value);
+    return { trackedValue: value, query: p.name, shadow: p.shadow };
+  });
   const [open, setOpen] = useState(false);
   const [highlightIndex, setHighlightIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  // Sync external value changes
-  useEffect(() => {
+  // Reset when value prop changes externally
+  let { query, shadow } = state;
+  if (state.trackedValue !== value) {
     const p = parseShadow(value);
-    setQuery(p.name);
-    setShadow(p.shadow);
-  }, [value]);
+    query = p.name;
+    shadow = p.shadow;
+    setState({ trackedValue: value, query, shadow });
+  }
+
+  const setQuery = (v: string) => setState((s) => ({ ...s, query: v }));
+  const setShadow = (v: boolean) => setState((s) => ({ ...s, shadow: v }));
 
   const emit = useCallback((name: string, isShadow: boolean) => {
     if (!name) {
@@ -48,7 +54,7 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
     : [];
 
   const select = useCallback((name: string) => {
-    setQuery(name);
+    setState((s) => ({ ...s, query: name }));
     emit(name, shadow);
     setOpen(false);
   }, [emit, shadow]);
