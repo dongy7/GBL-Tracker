@@ -39,6 +39,7 @@ function App() {
   const { teams, addTeam, updateTeam, deleteTeam, getTeamsForLeagues } = useTeams();
   const availableLeagues = getAvailableLeagues(date);
   const availableTeams = getTeamsForLeagues(availableLeagues.map((l) => l.name));
+  const isFutureDate = date > todayString();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -191,7 +192,11 @@ function App() {
           </div>
 
           {/* Add set button */}
-          {availableLeagues.length > 0 && (
+          {isFutureDate ? (
+            <p className="text-center text-sm text-gray-400 dark:text-gray-500 italic py-3">
+              Cannot record sets for future dates.
+            </p>
+          ) : availableLeagues.length > 0 && (
             <button
               onClick={addSet}
               disabled={!canAddSet}
