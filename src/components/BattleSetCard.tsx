@@ -133,6 +133,7 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
             battle={battle}
             index={i + 1}
             availableLeagues={availableLeagues}
+            savedTeams={savedTeams}
             onUpdate={(patch) => updateBattle(battle.id, patch)}
           />
         ))}
@@ -158,10 +159,11 @@ interface BattleRowProps {
   battle: Battle;
   index: number;
   availableLeagues: LeagueSchedule[];
+  savedTeams: SavedTeam[];
   onUpdate: (patch: Partial<Battle>) => void;
 }
 
-function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps) {
+function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: BattleRowProps) {
   const updateTeamMember = (
     team: "myTeam" | "opponentTeam",
     idx: number,
@@ -227,6 +229,21 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
       {/* Row 2: my team */}
       <div className="flex items-center gap-1.5 pl-7">
         <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Me</span>
+        {savedTeams.length > 0 && (
+          <select
+            value=""
+            onChange={(e) => {
+              const team = savedTeams.find((t) => t.id === e.target.value);
+              if (team) onUpdate({ myTeam: [...team.pokemon] as [string, string, string] });
+            }}
+            className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
+          >
+            <option value="" disabled>Preset</option>
+            {savedTeams.map((t) => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
+        )}
         {battle.myTeam.map((mon, i) => (
           <PokemonInput
             key={i}
@@ -241,6 +258,21 @@ function BattleRow({ battle, index, availableLeagues, onUpdate }: BattleRowProps
       {/* Row 3: opponent team + player ID */}
       <div className="flex items-center gap-1.5 pl-7">
         <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Opp</span>
+        {savedTeams.length > 0 && (
+          <select
+            value=""
+            onChange={(e) => {
+              const team = savedTeams.find((t) => t.id === e.target.value);
+              if (team) onUpdate({ opponentTeam: [...team.pokemon] as [string, string, string] });
+            }}
+            className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
+          >
+            <option value="" disabled>Preset</option>
+            {savedTeams.map((t) => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
+        )}
         {battle.opponentTeam.map((mon, i) => (
           <PokemonInput
             key={i}
