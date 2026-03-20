@@ -31,6 +31,13 @@ export interface DayRecord {
   startRating?: Rating; // rating at the start of the day
 }
 
+export interface SavedTeam {
+  id: string;
+  name: string;
+  pokemon: [string, string, string];
+  leagues: string[];
+}
+
 export interface LeagueSchedule {
   name: string;
   icon: string;

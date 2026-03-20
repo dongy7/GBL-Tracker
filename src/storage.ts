@@ -1,6 +1,7 @@
-import type { BattleSet, DayRecord, Rating } from "./types";
+import type { BattleSet, DayRecord, Rating, SavedTeam } from "./types";
 
 const STORAGE_KEY = "pogo-gbl-tracker";
+const TEAMS_KEY = "pogo-gbl-teams";
 
 export function loadAllData(): Record<string, DayRecord> {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -39,16 +40,38 @@ export function loadPreviousDayRating(date: string): Rating | null {
   return null;
 }
 
+// Teams
+export function loadTeams(): SavedTeam[] {
+  const raw = localStorage.getItem(TEAMS_KEY);
+  if (!raw) return [];
+  return JSON.parse(raw);
+}
+
+export function saveTeams(teams: SavedTeam[]): void {
+  localStorage.setItem(TEAMS_KEY, JSON.stringify(teams));
+}
+
+// Export/Import
 export function exportData(): string {
-  return localStorage.getItem(STORAGE_KEY) ?? "{}";
+  const tracker = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}");
+  const teams = JSON.parse(localStorage.getItem(TEAMS_KEY) ?? "[]");
+  return JSON.stringify({ tracker, teams });
 }
 
 export function importData(json: string): void {
-  const parsed = JSON.parse(json); // throws on invalid JSON
+  const parsed = JSON.parse(json);
   if (typeof parsed !== "object" || parsed === null) {
     throw new Error("Invalid data format");
   }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+  // Support new format { tracker, teams } and legacy format (just tracker data)
+  if ("tracker" in parsed) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed.tracker));
+    if (parsed.teams) {
+      localStorage.setItem(TEAMS_KEY, JSON.stringify(parsed.teams));
+    }
+  } else {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+  }
 }
 
 export function createBattleSet(

@@ -5,7 +5,9 @@ import { BattleSetCard } from "./components/BattleSetCard";
 import { DaySummary } from "./components/DaySummary";
 import { RatingInput } from "./components/RatingInput";
 import ReportPage from "./components/ReportPage";
+import TeamsPage from "./components/TeamsPage";
 import { useDay } from "./hooks/useDay";
+import { useTeams } from "./hooks/useTeams";
 import type { Rating } from "./types";
 import { useTheme } from "./hooks/useTheme";
 import { getAvailableLeagues, SEASON_NAME } from "./leagues";
@@ -29,12 +31,14 @@ function todayString(): string {
 }
 
 function App() {
-  const [page, setPage] = useState<"tracker" | "report">("tracker");
+  const [page, setPage] = useState<"tracker" | "report" | "teams">("tracker");
   const [date, setDate] = useState(todayString);
   const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating } =
     useDay(date);
   const { theme, cycle } = useTheme();
+  const { teams, addTeam, updateTeam, deleteTeam, getTeamsForLeagues } = useTeams();
   const availableLeagues = getAvailableLeagues(date);
+  const availableTeams = getTeamsForLeagues(availableLeagues.map((l) => l.name));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -87,6 +91,16 @@ function App() {
                 }`}
               >
                 Tracker
+              </button>
+              <button
+                onClick={() => setPage("teams")}
+                className={`px-3 py-1.5 text-xs font-medium ${
+                  page === "teams"
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                }`}
+              >
+                Teams
               </button>
               <button
                 onClick={() => setPage("report")}
@@ -163,6 +177,7 @@ function App() {
                   key={set.id}
                   battleSet={set}
                   availableLeagues={availableLeagues}
+                  savedTeams={availableTeams}
                   beforeRating={before}
                   onUpdate={(updater) => updateSet(set.id, updater)}
                   onDelete={() => deleteSet(set.id)}
@@ -182,6 +197,13 @@ function App() {
             </button>
           )}
         </main>
+      ) : page === "teams" ? (
+        <TeamsPage
+          teams={teams}
+          onAdd={addTeam}
+          onUpdate={updateTeam}
+          onDelete={deleteTeam}
+        />
       ) : (
         <ReportPage />
       )}

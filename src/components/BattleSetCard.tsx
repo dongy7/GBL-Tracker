@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { BattleSet, Battle, Rating } from "../types";
+import type { BattleSet, Battle, Rating, SavedTeam } from "../types";
 import type { LeagueSchedule } from "../types";
 import { PokemonInput } from "./PokemonInput";
 import { SetRatingInput } from "./SetRatingInput";
@@ -10,12 +10,13 @@ const HEADER_INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-300 dark
 interface Props {
   battleSet: BattleSet;
   availableLeagues: LeagueSchedule[];
+  savedTeams?: SavedTeam[];
   beforeRating?: Rating;
   onUpdate: (updater: (s: BattleSet) => BattleSet) => void;
   onDelete: () => void;
 }
 
-export function BattleSetCard({ battleSet, availableLeagues, beforeRating, onUpdate, onDelete }: Props) {
+export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], beforeRating, onUpdate, onDelete }: Props) {
   const wins = battleSet.battles.filter((b) => b.result === "win").length;
   const losses = battleSet.battles.filter((b) => b.result === "loss").length;
   const draws = battleSet.battles.filter((b) => b.result === "draw").length;
@@ -85,6 +86,21 @@ export function BattleSetCard({ battleSet, availableLeagues, beforeRating, onUpd
         {/* Team template */}
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-gray-500 dark:text-gray-400 w-14 shrink-0">My team</span>
+          {savedTeams.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => {
+                const team = savedTeams.find((t) => t.id === e.target.value);
+                if (team) setSetTeam([...team.pokemon]);
+              }}
+              className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 w-auto shrink-0"
+            >
+              <option value="" disabled>Preset</option>
+              {savedTeams.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          )}
           {setTeam.map((mon, i) => (
             <PokemonInput
               key={i}
