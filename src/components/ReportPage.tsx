@@ -3,6 +3,7 @@ import type { Rating } from "../types";
 import { loadAllData } from "../storage";
 import { formatRating, effectiveTier } from "../rating";
 import EloChart from "./EloChart";
+import { SortableStatTable } from "./SortableStatTable";
 
 interface PokemonStat {
   name: string;
@@ -281,52 +282,7 @@ export default function ReportPage() {
                   {league}
                 </h3>
               )}
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                      <th className="pb-2 pr-4">Lead</th>
-                      <th className="pb-2 pr-4 text-right">Seen</th>
-                      <th className="pb-2 pr-4 text-right">W</th>
-                      <th className="pb-2 pr-4 text-right">L</th>
-                      <th className="pb-2 text-right">Win %</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pokemon.slice(0, 10).map((p) => {
-                      const totalWithResult = p.wins + p.losses + p.draws;
-                      const pWinRate =
-                        totalWithResult > 0
-                          ? ((p.wins / totalWithResult) * 100).toFixed(1)
-                          : "-";
-                      return (
-                        <tr
-                          key={p.name}
-                          className="border-b border-gray-100 dark:border-gray-800"
-                        >
-                          <td className="py-1.5 pr-4 text-gray-900 dark:text-gray-100">
-                            {p.name}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-gray-600 dark:text-gray-400">
-                            {p.used}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-green-600 dark:text-green-400">
-                            {p.wins}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-red-600 dark:text-red-400">
-                            {p.losses}
-                          </td>
-                          <td className="py-1.5 text-right text-gray-700 dark:text-gray-300">
-                            {pWinRate}
-                            {pWinRate !== "-" ? "%" : ""}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <SortableStatTable data={pokemon} nameHeader="Lead" countHeader="Seen" limit={10} />
             </div>
           ))}
         </div>
@@ -346,52 +302,7 @@ export default function ReportPage() {
                   {league}
                 </h3>
               )}
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                      <th className="pb-2 pr-4">Pokemon</th>
-                      <th className="pb-2 pr-4 text-right">Used</th>
-                      <th className="pb-2 pr-4 text-right">W</th>
-                      <th className="pb-2 pr-4 text-right">L</th>
-                      <th className="pb-2 text-right">Win %</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pokemon.map((p) => {
-                      const totalWithResult = p.wins + p.losses + p.draws;
-                      const pWinRate =
-                        totalWithResult > 0
-                          ? ((p.wins / totalWithResult) * 100).toFixed(1)
-                          : "-";
-                      return (
-                        <tr
-                          key={p.name}
-                          className="border-b border-gray-100 dark:border-gray-800"
-                        >
-                          <td className="py-1.5 pr-4 text-gray-900 dark:text-gray-100">
-                            {p.name}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-gray-600 dark:text-gray-400">
-                            {p.used}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-green-600 dark:text-green-400">
-                            {p.wins}
-                          </td>
-                          <td className="py-1.5 pr-4 text-right text-red-600 dark:text-red-400">
-                            {p.losses}
-                          </td>
-                          <td className="py-1.5 text-right text-gray-700 dark:text-gray-300">
-                            {pWinRate}
-                            {pWinRate !== "-" ? "%" : ""}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              <SortableStatTable data={pokemon} nameHeader="Pokemon" countHeader="Used" />
             </div>
           ))}
         </div>
