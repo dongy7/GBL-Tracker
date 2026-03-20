@@ -72,16 +72,50 @@ function App() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <header className="border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="border-b border-gray-200 dark:border-gray-800 px-4 py-3">
+        <div className="max-w-4xl mx-auto space-y-2">
+          {/* Row 1: title + utility buttons */}
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold">GBL Tracker</h1>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 Season: {SEASON_NAME}
               </p>
             </div>
-            <nav className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 ml-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleExport}
+                className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
+                title="Export data"
+              >
+                Export
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
+                title="Import data"
+              >
+                Import
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleImport}
+                className="hidden"
+              />
+              <button
+                onClick={cycle}
+                className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm transition-colors"
+                title={`Theme: ${THEME_LABELS[theme]}`}
+              >
+                {THEME_ICONS[theme]}
+              </button>
+            </div>
+          </div>
+          {/* Row 2: nav tabs + date picker */}
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <nav className="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
               <button
                 onClick={() => setPage("tracker")}
                 className={`px-3 py-1.5 text-xs font-medium ${
@@ -113,37 +147,7 @@ function App() {
                 Reports
               </button>
             </nav>
-          </div>
-          <div className="flex items-center gap-3">
             <DatePicker date={date} onChange={setDate} />
-            <button
-              onClick={handleExport}
-              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
-              title="Export data"
-            >
-              Export
-            </button>
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-xs transition-colors"
-              title="Import data"
-            >
-              Import
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-            />
-            <button
-              onClick={cycle}
-              className="px-2.5 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-sm transition-colors"
-              title={`Theme: ${THEME_LABELS[theme]}`}
-            >
-              {THEME_ICONS[theme]}
-            </button>
           </div>
         </div>
       </header>

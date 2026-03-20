@@ -84,44 +84,48 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
         </div>
 
         {/* Team template */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-gray-500 dark:text-gray-400 w-14 shrink-0">My team</span>
-          {savedTeams.length > 0 && (
-            <select
-              value=""
-              onChange={(e) => {
-                const team = savedTeams.find((t) => t.id === e.target.value);
-                if (team) setSetTeam([...team.pokemon]);
-              }}
-              className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 w-auto shrink-0"
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">My team</span>
+            {savedTeams.length > 0 && (
+              <select
+                value=""
+                onChange={(e) => {
+                  const team = savedTeams.find((t) => t.id === e.target.value);
+                  if (team) setSetTeam([...team.pokemon]);
+                }}
+                className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 w-auto shrink-0"
+              >
+                <option value="" disabled>Preset</option>
+                {savedTeams.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            )}
+            <button
+              onClick={applyTeamToAll}
+              disabled={!hasTeam}
+              className="shrink-0 ml-auto px-2.5 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              title="Apply this team to all battles in this set"
             >
-              <option value="" disabled>Preset</option>
-              {savedTeams.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-          )}
-          {setTeam.map((mon, i) => (
-            <PokemonInput
-              key={i}
-              value={mon}
-              onChange={(v) => {
-                const next = [...setTeam] as [string, string, string];
-                next[i] = v;
-                setSetTeam(next);
-              }}
-              placeholder={`Pokemon ${i + 1}`}
-              className={HEADER_INPUT_CLASS}
-            />
-          ))}
-          <button
-            onClick={applyTeamToAll}
-            disabled={!hasTeam}
-            className="shrink-0 px-2.5 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="Apply this team to all battles in this set"
-          >
-            Apply to all
-          </button>
+              Apply to all
+            </button>
+          </div>
+          <div className="flex gap-1.5">
+            {setTeam.map((mon, i) => (
+              <PokemonInput
+                key={i}
+                value={mon}
+                onChange={(v) => {
+                  const next = [...setTeam] as [string, string, string];
+                  next[i] = v;
+                  setSetTeam(next);
+                }}
+                placeholder={`Pokemon ${i + 1}`}
+                className={HEADER_INPUT_CLASS}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -183,7 +187,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
         <select
           value={battle.league}
           onChange={(e) => onUpdate({ league: e.target.value })}
-          className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 w-auto shrink-0"
+          className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 min-w-0 flex-1"
         >
           {availableLeagues.map((l, i) => (
             <option key={i} value={l.name}>
@@ -227,68 +231,76 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
       </div>
 
       {/* Row 2: my team */}
-      <div className="flex items-center gap-1.5 pl-7">
-        <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Me</span>
-        {savedTeams.length > 0 && (
-          <select
-            value=""
-            onChange={(e) => {
-              const team = savedTeams.find((t) => t.id === e.target.value);
-              if (team) onUpdate({ myTeam: [...team.pokemon] as [string, string, string] });
-            }}
-            className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
-          >
-            <option value="" disabled>Preset</option>
-            {savedTeams.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-        )}
-        {battle.myTeam.map((mon, i) => (
-          <PokemonInput
-            key={i}
-            value={mon}
-            onChange={(v) => updateTeamMember("myTeam", i, v)}
-            placeholder={`Pokemon ${i + 1}`}
-            className={INPUT_CLASS}
-          />
-        ))}
+      <div className="space-y-1 pl-7">
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-400 dark:text-gray-500 text-xs shrink-0">Me</span>
+          {savedTeams.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => {
+                const team = savedTeams.find((t) => t.id === e.target.value);
+                if (team) onUpdate({ myTeam: [...team.pokemon] as [string, string, string] });
+              }}
+              className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
+            >
+              <option value="" disabled>Preset</option>
+              {savedTeams.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div className="flex gap-1">
+          {battle.myTeam.map((mon, i) => (
+            <PokemonInput
+              key={i}
+              value={mon}
+              onChange={(v) => updateTeamMember("myTeam", i, v)}
+              placeholder={`Pokemon ${i + 1}`}
+              className={INPUT_CLASS}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Row 3: opponent team + player ID */}
-      <div className="flex items-center gap-1.5 pl-7">
-        <span className="text-gray-400 dark:text-gray-500 text-xs w-8 shrink-0">Opp</span>
-        {savedTeams.length > 0 && (
-          <select
-            value=""
-            onChange={(e) => {
-              const team = savedTeams.find((t) => t.id === e.target.value);
-              if (team) onUpdate({ opponentTeam: [...team.pokemon] as [string, string, string] });
-            }}
-            className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
-          >
-            <option value="" disabled>Preset</option>
-            {savedTeams.map((t) => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-        )}
-        {battle.opponentTeam.map((mon, i) => (
-          <PokemonInput
-            key={i}
-            value={mon}
-            onChange={(v) => updateTeamMember("opponentTeam", i, v)}
-            placeholder={`Pokemon ${i + 1}`}
-            className={INPUT_CLASS}
+      <div className="space-y-1 pl-7">
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-400 dark:text-gray-500 text-xs shrink-0">Opp</span>
+          {savedTeams.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => {
+                const team = savedTeams.find((t) => t.id === e.target.value);
+                if (team) onUpdate({ opponentTeam: [...team.pokemon] as [string, string, string] });
+              }}
+              className="text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1 py-0.5 w-auto shrink-0"
+            >
+              <option value="" disabled>Preset</option>
+              {savedTeams.map((t) => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          )}
+          <input
+            type="text"
+            value={battle.opponentId ?? ""}
+            onChange={(e) => onUpdate({ opponentId: e.target.value || undefined })}
+            placeholder="Player ID"
+            className="text-[10px] px-1.5 py-0.5 border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600 w-20 shrink-0 ml-auto"
           />
-        ))}
-        <input
-          type="text"
-          value={battle.opponentId ?? ""}
-          onChange={(e) => onUpdate({ opponentId: e.target.value || undefined })}
-          placeholder="Player ID"
-          className={`${INPUT_CLASS} max-w-24`}
-        />
+        </div>
+        <div className="flex gap-1">
+          {battle.opponentTeam.map((mon, i) => (
+            <PokemonInput
+              key={i}
+              value={mon}
+              onChange={(v) => updateTeamMember("opponentTeam", i, v)}
+              placeholder={`Pokemon ${i + 1}`}
+              className={INPUT_CLASS}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
