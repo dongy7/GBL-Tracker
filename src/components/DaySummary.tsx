@@ -1,10 +1,12 @@
-import type { DayRecord } from "../types";
+import type { DayRecord, Rating } from "../types";
+import { formatRating } from "../rating";
 
 interface Props {
   dayRecord: DayRecord;
+  startRating?: Rating;
 }
 
-export function DaySummary({ dayRecord }: Props) {
+export function DaySummary({ dayRecord, startRating }: Props) {
   if (dayRecord.sets.length === 0) return null;
 
   const allBattles = dayRecord.sets.flatMap((s) => s.battles);
@@ -24,6 +26,16 @@ export function DaySummary({ dayRecord }: Props) {
     byLeague.set(b.league, entry);
   }
 
+  // ELO change: from start rating to last set's end rating
+  const lastEndRating = [...dayRecord.sets].reverse().find((s) => s.endRating)?.endRating;
+  let eloDelta: number | null = null;
+  if (
+    startRating?.type === "elo" &&
+    lastEndRating?.type === "elo"
+  ) {
+    eloDelta = lastEndRating.value - startRating.value;
+  }
+
   if (total === 0) return null;
 
   return (
@@ -31,7 +43,7 @@ export function DaySummary({ dayRecord }: Props) {
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
         Daily Summary
       </h3>
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 flex-wrap">
         <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           <span className="text-green-600 dark:text-green-400">{totalWins}W</span>
           {" - "}
@@ -46,8 +58,24 @@ export function DaySummary({ dayRecord }: Props) {
         <div className="text-sm text-gray-500">
           {total > 0 && `${Math.round((totalWins / total) * 100)}% win rate`}
         </div>
+        {eloDelta !== null && (
+          <div className={`text-sm font-semibold ${
+            eloDelta > 0
+              ? "text-green-600 dark:text-green-400"
+              : eloDelta < 0
+                ? "text-red-600 dark:text-red-400"
+                : "text-gray-500"
+          }`}>
+            ELO: {eloDelta > 0 ? `+${eloDelta}` : eloDelta}
+            {lastEndRating && (
+              <span className="text-gray-400 font-normal ml-1">
+                ({formatRating(lastEndRating)})
+              </span>
+            )}
+          </div>
+        )}
         {/* Win rate bar */}
-        <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
+        <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex min-w-20">
           <div
             className="h-full bg-green-500 transition-all"
             style={{ width: `${total > 0 ? (totalWins / total) * 100 : 0}%` }}

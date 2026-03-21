@@ -181,7 +181,7 @@ function App() {
           />
 
           {/* Daily summary */}
-          <DaySummary dayRecord={dayRecord} />
+          <DaySummary dayRecord={dayRecord} startRating={dayRecord.startRating ?? previousDayRating ?? undefined} />
 
           {/* Battle sets */}
           <div className="space-y-4">
