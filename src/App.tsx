@@ -33,7 +33,7 @@ function todayString(): string {
 function App() {
   const [page, setPage] = useState<"tracker" | "report" | "teams">("tracker");
   const [date, setDate] = useState(todayString);
-  const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating } =
+  const { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating, toggleBankedSet, canBank } =
     useDay(date);
   const { theme, cycle } = useTheme();
   const { teams, addTeam, updateTeam, deleteTeam, getTeamsForLeagues } = useTeams();
@@ -157,6 +157,21 @@ function App() {
         <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
           {/* Active leagues */}
           <ActiveLeagues leagues={availableLeagues} />
+
+          {/* Banked set toggle */}
+          {(canBank || dayRecord.bankedSet) && (
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={dayRecord.bankedSet ?? false}
+                onChange={toggleBankedSet}
+                className="rounded"
+              />
+              <span className="text-gray-600 dark:text-gray-400">
+                Banked set from previous day (+1 set)
+              </span>
+            </label>
+          )}
 
           {/* Start rating */}
           <RatingInput

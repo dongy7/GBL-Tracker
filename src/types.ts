@@ -29,6 +29,7 @@ export interface DayRecord {
   date: string;
   sets: BattleSet[];
   startRating?: Rating; // rating at the start of the day
+  bankedSet?: boolean; // true if a set was banked from the previous day
 }
 
 export interface SavedTeam {

@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import type { BattleSet, DayRecord, Rating } from "../types";
-import { loadDay, loadPreviousDayRating, saveDay, createBattleSet } from "../storage";
+import { loadDay, loadPreviousDayRating, canBankFromPreviousDay, saveDay, createBattleSet } from "../storage";
 import { getMaxSets, getAvailableLeagues } from "../leagues";
 
 function loadOrCreate(date: string): DayRecord {
@@ -28,8 +28,12 @@ export function useDay(date: string) {
     []
   );
 
+  const toggleBankedSet = useCallback(() => {
+    persist({ ...dayRecord, bankedSet: !dayRecord.bankedSet });
+  }, [dayRecord, persist]);
+
   const addSet = useCallback(() => {
-    const maxSets = getMaxSets(date);
+    const maxSets = getMaxSets(date) + (dayRecord.bankedSet ? 1 : 0);
     if (dayRecord.sets.length >= maxSets) return;
     const leagues = getAvailableLeagues(date);
     const defaultLeague = leagues[0]?.name ?? "Great League";
@@ -73,9 +77,10 @@ export function useDay(date: string) {
   );
 
   const previousDayRating = loadPreviousDayRating(date);
+  const canBank = canBankFromPreviousDay(date);
 
-  const maxSets = getMaxSets(date);
+  const maxSets = getMaxSets(date) + (dayRecord.bankedSet ? 1 : 0);
   const canAddSet = dayRecord.sets.length < maxSets;
 
-  return { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating };
+  return { dayRecord, addSet, updateSet, deleteSet, canAddSet, maxSets, setStartRating, previousDayRating, toggleBankedSet, canBank };
 }

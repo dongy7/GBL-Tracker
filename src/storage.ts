@@ -1,4 +1,5 @@
 import type { BattleSet, DayRecord, Rating, SavedTeam } from "./types";
+import { getMaxSets } from "./leagues";
 
 const STORAGE_KEY = "pogo-gbl-tracker";
 const TEAMS_KEY = "pogo-gbl-teams";
@@ -38,6 +39,22 @@ export function loadPreviousDayRating(date: string): Rating | null {
     if (record.startRating) return record.startRating;
   }
   return null;
+}
+
+export function canBankFromPreviousDay(date: string): boolean {
+  const all = loadAllData();
+  // Find the day immediately before this date that has data
+  const previousDates = Object.keys(all)
+    .filter((d) => d < date)
+    .sort()
+    .reverse();
+
+  if (previousDates.length === 0) return false;
+  const prevDate = previousDates[0];
+  const prevRecord = all[prevDate];
+  const prevMax = getMaxSets(prevDate);
+  // Can bank if previous day didn't use all sets
+  return prevRecord.sets.length < prevMax;
 }
 
 // Teams
