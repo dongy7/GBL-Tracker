@@ -52,10 +52,27 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg">
       {/* Set header */}
       <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-            Set {battleSet.setNumber}
-          </h3>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 shrink-0">
+              Set {battleSet.setNumber}
+            </h3>
+            <select
+              value={battleSet.battles[0]?.league ?? ""}
+              onChange={(e) => {
+                const league = e.target.value;
+                onUpdate((s) => ({
+                  ...s,
+                  battles: s.battles.map((b) => ({ ...b, league })),
+                }));
+              }}
+              className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 min-w-0 flex-1"
+            >
+              {availableLeagues.map((l, i) => (
+                <option key={i} value={l.name}>{l.name}</option>
+              ))}
+            </select>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium">
               <span className="text-green-600 dark:text-green-400">{wins}W</span>
