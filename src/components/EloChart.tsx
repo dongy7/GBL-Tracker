@@ -20,7 +20,7 @@ export default function EloChart({ dataPoints }: EloChartProps) {
 
   if (dataPoints.length === 0) return null;
 
-  const padding = { top: 30, right: 60, bottom: 50, left: 60 };
+  const padding = { top: 30, right: 80, bottom: 50, left: 60 };
   const width = 700;
   const height = 350;
   const chartWidth = width - padding.left - padding.right;
@@ -194,10 +194,10 @@ export default function EloChart({ dataPoints }: EloChartProps) {
         {hoveredIndex !== null && (
           <g>
             <rect
-              x={scaleX(hoveredIndex) - 50}
-              y={scaleY(dataPoints[hoveredIndex].elo) - 38}
-              width={100}
-              height={28}
+              x={scaleX(hoveredIndex) - 65}
+              y={scaleY(dataPoints[hoveredIndex].elo) - 40}
+              width={130}
+              height={32}
               rx={4}
               className="fill-gray-800 dark:fill-gray-200"
               opacity={0.9}

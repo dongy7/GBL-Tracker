@@ -10,7 +10,7 @@ interface Props {
 
 export function SetRatingInput({ beforeRating, endRating, onSave }: Props) {
   const isElo = beforeRating.type === "elo";
-  const [mode, setMode] = useState<"delta" | "absolute">(isElo ? "delta" : "absolute");
+  const [mode, setMode] = useState<"delta" | "absolute">("absolute");
   const [value, setValue] = useState("");
   const [editing, setEditing] = useState(!endRating);
 
