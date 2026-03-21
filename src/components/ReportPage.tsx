@@ -4,6 +4,7 @@ import { loadAllData } from "../storage";
 import { formatRating, effectiveTier } from "../rating";
 import EloChart from "./EloChart";
 import { SortableStatTable } from "./SortableStatTable";
+import { LeagueTabs } from "./LeagueTabs";
 
 interface PokemonStat {
   name: string;
@@ -146,7 +147,6 @@ export default function ReportPage() {
       peakRating,
       pokemonUsage,
       leadUsage,
-      hasMultipleLeagues: leaguesUsed.size > 1,
     };
   }, []);
 
@@ -163,7 +163,6 @@ export default function ReportPage() {
     peakRating,
     pokemonUsage,
     leadUsage,
-    hasMultipleLeagues,
   } = stats;
 
   return (
@@ -275,16 +274,14 @@ export default function ReportPage() {
             Opponent Leads
           </h2>
 
-          {leadUsage.map(({ league, pokemon }) => (
-            <div key={league} className="space-y-2">
-              {hasMultipleLeagues && (
-                <h3 className="text-md font-medium text-gray-700 dark:text-gray-300">
-                  {league}
-                </h3>
-              )}
-              <SortableStatTable data={pokemon} nameHeader="Lead" countHeader="Seen" limit={10} />
-            </div>
-          ))}
+          <LeagueTabs leagues={leadUsage.map((l) => l.league)}>
+            {(selected) => {
+              const match = leadUsage.find((l) => l.league === selected);
+              return match ? (
+                <SortableStatTable data={match.pokemon} nameHeader="Lead" countHeader="Seen" limit={10} />
+              ) : null;
+            }}
+          </LeagueTabs>
         </div>
       )}
 
@@ -295,16 +292,14 @@ export default function ReportPage() {
             Opponent Pokemon Usage
           </h2>
 
-          {pokemonUsage.map(({ league, pokemon }) => (
-            <div key={league} className="space-y-2">
-              {hasMultipleLeagues && (
-                <h3 className="text-md font-medium text-gray-700 dark:text-gray-300">
-                  {league}
-                </h3>
-              )}
-              <SortableStatTable data={pokemon} nameHeader="Pokemon" countHeader="Used" />
-            </div>
-          ))}
+          <LeagueTabs leagues={pokemonUsage.map((l) => l.league)}>
+            {(selected) => {
+              const match = pokemonUsage.find((l) => l.league === selected);
+              return match ? (
+                <SortableStatTable data={match.pokemon} nameHeader="Pokemon" countHeader="Used" />
+              ) : null;
+            }}
+          </LeagueTabs>
         </div>
       )}
     </div>
