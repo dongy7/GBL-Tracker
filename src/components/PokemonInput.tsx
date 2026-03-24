@@ -1,4 +1,16 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useMemo, useCallback, useSyncExternalStore } from "react";
+import Select, { type StylesConfig, type SingleValue } from "react-select";
+
+function useIsDark() {
+  return useSyncExternalStore(
+    (cb) => {
+      const obs = new MutationObserver(cb);
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+      return () => obs.disconnect();
+    },
+    () => document.documentElement.classList.contains("dark"),
+  );
+}
 import { POKEMON_NAMES } from "../pokemon";
 
 const SHADOW_PREFIX = "Shadow ";
@@ -10,6 +22,13 @@ function parseShadow(value: string): { name: string; shadow: boolean } {
   return { name: value, shadow: false };
 }
 
+interface Option {
+  value: string;
+  label: string;
+}
+
+const allOptions: Option[] = POKEMON_NAMES.map((n) => ({ value: n, label: n }));
+
 interface Props {
   value: string;
   onChange: (value: string) => void;
@@ -18,100 +37,126 @@ interface Props {
 }
 
 export function PokemonInput({ value, onChange, placeholder, className }: Props) {
-  const [state, setState] = useState(() => {
-    const p = parseShadow(value);
-    return { trackedValue: value, query: p.name, shadow: p.shadow };
-  });
-  const [open, setOpen] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
+  const dark = useIsDark();
+  const { name, shadow } = parseShadow(value);
 
-  // Reset when value prop changes externally
-  let { query, shadow } = state;
-  if (state.trackedValue !== value) {
-    const p = parseShadow(value);
-    query = p.name;
-    shadow = p.shadow;
-    setState({ trackedValue: value, query, shadow });
-  }
+  const selected = useMemo<Option | null>(
+    () => (name ? { value: name, label: name } : null),
+    [name],
+  );
 
-  const setQuery = (v: string) => setState((s) => ({ ...s, query: v }));
-  const setShadow = (v: boolean) => setState((s) => ({ ...s, shadow: v }));
-
-  const emit = useCallback((name: string, isShadow: boolean) => {
-    if (!name) {
-      onChange("");
-      return;
-    }
-    onChange(isShadow ? SHADOW_PREFIX + name : name);
-  }, [onChange]);
-
-  const matches = open && query.length >= 1
-    ? POKEMON_NAMES.filter((n) =>
-        n.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 8)
-    : [];
-
-  const select = useCallback((name: string) => {
-    setState((s) => ({ ...s, query: name }));
-    emit(name, shadow);
-    setOpen(false);
-  }, [emit, shadow]);
-
-  const handleChange = (text: string) => {
-    setQuery(text);
-    setOpen(true);
-    setHighlightIndex(0);
-    if (text === "") {
-      onChange("");
-    }
-  };
-
-  const toggleShadow = () => {
-    const next = !shadow;
-    setShadow(next);
-    emit(query, next);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!open || matches.length === 0) return;
-
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightIndex((i) => Math.min(i + 1, matches.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      select(matches[highlightIndex]);
-    } else if (e.key === "Escape") {
-      setOpen(false);
-    }
-  };
-
-  // Scroll highlighted item into view
-  useEffect(() => {
-    if (listRef.current) {
-      const item = listRef.current.children[highlightIndex] as HTMLElement;
-      item?.scrollIntoView({ block: "nearest" });
-    }
-  }, [highlightIndex]);
-
-  // Close on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
+  const emit = useCallback(
+    (pokeName: string, isShadow: boolean) => {
+      if (!pokeName) {
+        onChange("");
+        return;
       }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+      onChange(isShadow ? SHADOW_PREFIX + pokeName : pokeName);
+    },
+    [onChange],
+  );
+
+  const handleChange = useCallback(
+    (opt: SingleValue<Option>) => {
+      emit(opt?.value ?? "", shadow);
+    },
+    [emit, shadow],
+  );
+
+  const toggleShadow = useCallback(() => {
+    emit(name, !shadow);
+  }, [emit, name, shadow]);
+
+  // Filter: match anywhere in the name, limit to 50 results for performance
+  const filterOption = useCallback(
+    (option: Option, input: string) =>
+      option.value.toLowerCase().includes(input.toLowerCase()),
+    [],
+  );
+
+  const styles = useMemo<StylesConfig<Option, false>>(
+    () => ({
+      control: (base) => ({
+        ...base,
+        minHeight: "unset",
+        fontSize: "0.75rem",
+        lineHeight: "1rem",
+        background: "transparent",
+        border: "none",
+        boxShadow: "none",
+      }),
+      valueContainer: (base) => ({
+        ...base,
+        padding: "0 4px",
+      }),
+      input: (base) => ({
+        ...base,
+        margin: 0,
+        padding: 0,
+        fontSize: "0.75rem",
+        color: dark ? "rgb(209 213 219)" : undefined,
+      }),
+      indicatorsContainer: (base) => ({
+        ...base,
+      }),
+      clearIndicator: (base) => ({
+        ...base,
+        padding: "0 2px",
+        color: dark ? "rgb(156 163 175)" : "rgb(156 163 175)",
+        ":hover": {
+          color: dark ? "rgb(209 213 219)" : "rgb(55 65 81)",
+        },
+      }),
+      dropdownIndicator: () => ({
+        display: "none",
+      }),
+      indicatorSeparator: () => ({
+        display: "none",
+      }),
+      menu: (base) => ({
+        ...base,
+        fontSize: "0.75rem",
+        zIndex: 50,
+        marginTop: "2px",
+        backgroundColor: dark ? "rgb(31 41 55)" : "white",
+        border: dark ? "1px solid rgb(55 65 81)" : "1px solid rgb(229 231 235)",
+        borderRadius: "0.25rem",
+        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+        left: 0,
+        right: 0,
+        width: "100%",
+      }),
+      option: (base, state) => ({
+        ...base,
+        padding: "4px 8px",
+        backgroundColor: state.isFocused
+          ? "rgb(59 130 246)"
+          : dark
+            ? "rgb(31 41 55)"
+            : "white",
+        color: state.isFocused ? "white" : dark ? "rgb(209 213 219)" : "rgb(55 65 81)",
+        cursor: "pointer",
+      }),
+      singleValue: (base) => ({
+        ...base,
+        fontSize: "0.75rem",
+        color: dark ? "rgb(209 213 219)" : undefined,
+      }),
+      placeholder: (base) => ({
+        ...base,
+        fontSize: "0.75rem",
+        color: dark ? "rgb(75 85 99)" : undefined,
+      }),
+      noMessage: (base) => ({
+        ...base,
+        color: dark ? "rgb(156 163 175)" : undefined,
+      }),
+    }),
+    [dark],
+  );
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-0 flex gap-0.5">
+    <div className="relative flex-1 min-w-0 flex items-center gap-0.5">
       <button
         type="button"
         onClick={toggleShadow}
@@ -125,37 +170,19 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
         S
       </button>
       <div className="relative flex-1 min-w-0">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => handleChange(e.target.value)}
-          onFocus={() => { if (query.length >= 1) setOpen(true); }}
-          onBlur={() => { if (query && !value) emit(query, shadow); }}
-          onKeyDown={handleKeyDown}
+        <Select<Option, false>
+          value={selected}
+          onChange={handleChange}
+          options={allOptions}
+          filterOption={filterOption}
           placeholder={placeholder}
+          isClearable
+          styles={styles}
           className={className}
+          classNamePrefix="pokemon-select"
+          menuPlacement="auto"
+          maxMenuHeight={192}
         />
-        {open && matches.length > 0 && (
-          <ul
-            ref={listRef}
-            className="absolute z-50 left-0 right-0 top-full mt-0.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg max-h-48 overflow-y-auto text-xs"
-          >
-            {matches.map((name, i) => (
-              <li
-                key={name}
-                onMouseDown={() => select(name)}
-                onMouseEnter={() => setHighlightIndex(i)}
-                className={`px-2 py-1.5 cursor-pointer ${
-                  i === highlightIndex
-                    ? "bg-blue-500 text-white"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </div>
   );
