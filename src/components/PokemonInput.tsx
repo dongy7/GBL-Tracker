@@ -88,6 +88,7 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
       valueContainer: (base) => ({
         ...base,
         padding: "0 4px",
+        flexWrap: "nowrap",
       }),
       input: (base) => ({
         ...base,
@@ -98,6 +99,10 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
       }),
       indicatorsContainer: (base) => ({
         ...base,
+        position: "absolute",
+        right: 0,
+        top: "50%",
+        transform: "translateY(-50%)",
       }),
       clearIndicator: (base) => ({
         ...base,
@@ -137,15 +142,21 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
         color: state.isFocused ? "white" : dark ? "rgb(209 213 219)" : "rgb(55 65 81)",
         cursor: "pointer",
       }),
-      singleValue: (base) => ({
-        ...base,
-        fontSize: "0.75rem",
-        color: dark ? "rgb(209 213 219)" : undefined,
-      }),
       placeholder: (base) => ({
         ...base,
         fontSize: "0.75rem",
         color: dark ? "rgb(75 85 99)" : undefined,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }),
+      singleValue: (base) => ({
+        ...base,
+        fontSize: "0.75rem",
+        color: dark ? "rgb(209 213 219)" : undefined,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
       }),
       noOptionsMessage: (base) => ({
         ...base,
