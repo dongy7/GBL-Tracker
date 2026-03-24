@@ -147,7 +147,7 @@ export function PokemonInput({ value, onChange, placeholder, className }: Props)
         fontSize: "0.75rem",
         color: dark ? "rgb(75 85 99)" : undefined,
       }),
-      noMessage: (base) => ({
+      noOptionsMessage: (base) => ({
         ...base,
         color: dark ? "rgb(156 163 175)" : undefined,
       }),
