@@ -22,7 +22,24 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
   const draws = battleSet.battles.filter((b) => b.result === "draw").length;
   const recorded = wins + losses + draws;
 
-  const [collapsed, setCollapsed] = useState(false);
+  const COLLAPSE_KEY = "pogo-gbl-collapsed";
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? "[]");
+      return (stored as string[]).includes(battleSet.id);
+    } catch { return false; }
+  });
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        const stored: string[] = JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? "[]");
+        const updated = next ? [...new Set([...stored, battleSet.id])] : stored.filter((id) => id !== battleSet.id);
+        localStorage.setItem(COLLAPSE_KEY, JSON.stringify(updated));
+      } catch { /* ignore */ }
+      return next;
+    });
+  };
 
   const [setTeam, setSetTeam] = useState<[string, string, string]>(() => {
     const first = battleSet.battles[0];
@@ -57,7 +74,7 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
         <div className="flex items-center justify-between gap-2">
           <div
             className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
-            onClick={() => setCollapsed((c) => !c)}
+            onClick={toggleCollapsed}
           >
             <svg
               className={`w-3.5 h-3.5 shrink-0 text-gray-400 transition-transform ${collapsed ? "" : "rotate-90"}`}
