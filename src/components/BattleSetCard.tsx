@@ -22,6 +22,8 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
   const draws = battleSet.battles.filter((b) => b.result === "draw").length;
   const recorded = wins + losses + draws;
 
+  const [collapsed, setCollapsed] = useState(false);
+
   const [setTeam, setSetTeam] = useState<[string, string, string]>(() => {
     const first = battleSet.battles[0];
     if (first && first.myTeam.some((m) => m !== "")) {
@@ -53,25 +55,42 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
       {/* Set header */}
       <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
+            onClick={() => setCollapsed((c) => !c)}
+          >
+            <svg
+              className={`w-3.5 h-3.5 shrink-0 text-gray-400 transition-transform ${collapsed ? "" : "rotate-90"}`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+            </svg>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 shrink-0">
               Set {battleSet.setNumber}
             </h3>
-            <select
-              value={battleSet.battles[0]?.league ?? ""}
-              onChange={(e) => {
-                const league = e.target.value;
-                onUpdate((s) => ({
-                  ...s,
-                  battles: s.battles.map((b) => ({ ...b, league })),
-                }));
-              }}
-              className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 min-w-0 flex-1"
-            >
-              {availableLeagues.map((l, i) => (
-                <option key={i} value={l.name}>{l.name}</option>
-              ))}
-            </select>
+            {collapsed ? (
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                {battleSet.battles[0]?.league}
+              </span>
+            ) : (
+              <select
+                value={battleSet.battles[0]?.league ?? ""}
+                onChange={(e) => {
+                  const league = e.target.value;
+                  onUpdate((s) => ({
+                    ...s,
+                    battles: s.battles.map((b) => ({ ...b, league })),
+                  }));
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 min-w-0 flex-1"
+              >
+                {availableLeagues.map((l, i) => (
+                  <option key={i} value={l.name}>{l.name}</option>
+                ))}
+              </select>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium">
@@ -101,67 +120,71 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
         </div>
 
         {/* Team template */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">My team</span>
-            {savedTeams.length > 0 && (
-              <select
-                value=""
-                onChange={(e) => {
-                  const team = savedTeams.find((t) => t.id === e.target.value);
-                  if (team) setSetTeam([...team.pokemon]);
-                }}
-                className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 w-auto shrink-0"
+        {!collapsed && (
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">My team</span>
+              {savedTeams.length > 0 && (
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const team = savedTeams.find((t) => t.id === e.target.value);
+                    if (team) setSetTeam([...team.pokemon]);
+                  }}
+                  className="text-xs bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-1.5 py-1 w-auto shrink-0"
+                >
+                  <option value="" disabled>Preset</option>
+                  {savedTeams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={applyTeamToAll}
+                disabled={!hasTeam}
+                className="shrink-0 ml-auto px-2.5 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                title="Apply this team to all battles in this set"
               >
-                <option value="" disabled>Preset</option>
-                {savedTeams.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
-            )}
-            <button
-              onClick={applyTeamToAll}
-              disabled={!hasTeam}
-              className="shrink-0 ml-auto px-2.5 py-1 text-xs font-medium rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              title="Apply this team to all battles in this set"
-            >
-              Apply to all
-            </button>
+                Apply to all
+              </button>
+            </div>
+            <div className="flex gap-1.5">
+              {setTeam.map((mon, i) => (
+                <PokemonInput
+                  key={i}
+                  value={mon}
+                  onChange={(v) => {
+                    const next = [...setTeam] as [string, string, string];
+                    next[i] = v;
+                    setSetTeam(next);
+                  }}
+                  placeholder={`Pokemon ${i + 1}`}
+                  className={HEADER_INPUT_CLASS}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex gap-1.5">
-            {setTeam.map((mon, i) => (
-              <PokemonInput
-                key={i}
-                value={mon}
-                onChange={(v) => {
-                  const next = [...setTeam] as [string, string, string];
-                  next[i] = v;
-                  setSetTeam(next);
-                }}
-                placeholder={`Pokemon ${i + 1}`}
-                className={HEADER_INPUT_CLASS}
-              />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Battles */}
-      <div className="divide-y divide-gray-100 dark:divide-gray-800">
-        {battleSet.battles.map((battle, i) => (
-          <BattleRow
-            key={battle.id}
-            battle={battle}
-            index={i + 1}
-            availableLeagues={availableLeagues}
-            savedTeams={savedTeams}
-            onUpdate={(patch) => updateBattle(battle.id, patch)}
-          />
-        ))}
-      </div>
+      {!collapsed && (
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {battleSet.battles.map((battle, i) => (
+            <BattleRow
+              key={battle.id}
+              battle={battle}
+              index={i + 1}
+              availableLeagues={availableLeagues}
+              savedTeams={savedTeams}
+              onUpdate={(patch) => updateBattle(battle.id, patch)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Rating after set */}
-      {beforeRating && (
+      {!collapsed && beforeRating && (
         <div className="px-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
           <SetRatingInput
             beforeRating={beforeRating}
