@@ -77,9 +77,16 @@ export const LEAGUE_SCHEDULES: LeagueSchedule[] = [
 ];
 
 export function getAvailableLeagues(date: string): LeagueSchedule[] {
-  return LEAGUE_SCHEDULES.filter(
+  // Include leagues whose endDate is today because rotations happen at 1PM PST,
+  // so the previous rotation's leagues are still playable until the switch.
+  const current = LEAGUE_SCHEDULES.filter(
     (l) => date >= l.startDate && date < l.endDate
   );
+  const currentNames = new Set(current.map((l) => l.name));
+  const outgoing = LEAGUE_SCHEDULES.filter(
+    (l) => date === l.endDate && !currentNames.has(l.name)
+  );
+  return [...current, ...outgoing];
 }
 
 export function isThursday(date: string): boolean {

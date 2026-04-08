@@ -22,12 +22,30 @@ describe("getAvailableLeagues", () => {
     expect(names).toContain("Master League");
   });
 
-  it("does not include leagues from adjacent weeks", () => {
-    // March 10 starts Ultra League week, Great League ends
+  it("includes outgoing leagues on rotation day (1PM PST transition)", () => {
+    // March 10 starts Ultra League week, but Great League is still playable until 1PM PST
     const leagues = getAvailableLeagues("2026-03-10");
     const names = leagues.map((l) => l.name);
     expect(names).toContain("Ultra League");
-    expect(names).not.toContain("Great League");
+    expect(names).toContain("Spring Cup: Great League Edition");
+    // Outgoing leagues that share a name with the current rotation are not duplicated
+    expect(names).toContain("Great League");
+    expect(names).toContain("Kanto Cup: Great League Edition");
+  });
+
+  it("does not include outgoing leagues on the day after rotation", () => {
+    const leagues = getAvailableLeagues("2026-03-11");
+    const names = leagues.map((l) => l.name);
+    expect(names).toContain("Ultra League");
+    expect(names).not.toContain("Kanto Cup: Great League Edition");
+  });
+
+  it("does not duplicate leagues with the same name across rotations", () => {
+    // March 31: Great League ends (Mar 24-31) and starts (Mar 31-Apr 7)
+    const leagues = getAvailableLeagues("2026-03-31");
+    const names = leagues.map((l) => l.name);
+    const greatCount = names.filter((n) => n === "Great League").length;
+    expect(greatCount).toBe(1);
   });
 });
 
