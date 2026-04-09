@@ -1,11 +1,9 @@
 import { useState } from "react";
 import type { BattleSet, Battle, Rating, SavedTeam } from "../types";
 import type { LeagueSchedule } from "../types";
-import { PokemonInput } from "./PokemonInput";
+import { TeamInput } from "./TeamInput";
 import { SetRatingInput } from "./SetRatingInput";
 
-const INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600";
-const HEADER_INPUT_CLASS = "w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 placeholder:text-gray-300 dark:placeholder:text-gray-500";
 
 interface Props {
   battleSet: BattleSet;
@@ -165,21 +163,12 @@ export function BattleSetCard({ battleSet, availableLeagues, savedTeams = [], be
                 Apply to all
               </button>
             </div>
-            <div className="flex gap-1.5">
-              {setTeam.map((mon, i) => (
-                <PokemonInput
-                  key={i}
-                  value={mon}
-                  onChange={(v) => {
-                    const next = [...setTeam] as [string, string, string];
-                    next[i] = v;
-                    setSetTeam(next);
-                  }}
-                  placeholder={`Pokemon ${i + 1}`}
-                  className={HEADER_INPUT_CLASS}
-                />
-              ))}
-            </div>
+            <TeamInput
+              team={setTeam}
+              onChange={setSetTeam}
+              league={battleSet.battles[0]?.league}
+              className="border-gray-300 dark:border-gray-600 divide-gray-300 dark:divide-gray-600 bg-white dark:bg-gray-700"
+            />
           </div>
         )}
       </div>
@@ -225,14 +214,8 @@ interface BattleRowProps {
 }
 
 function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: BattleRowProps) {
-  const updateTeamMember = (
-    team: "myTeam" | "opponentTeam",
-    idx: number,
-    value: string
-  ) => {
-    const newTeam = [...battle[team]] as [string, string, string];
-    newTeam[idx] = value;
-    onUpdate({ [team]: newTeam });
+  const updateTeam = (team: "myTeam" | "opponentTeam", value: [string, string, string]) => {
+    onUpdate({ [team]: value });
   };
 
   return (
@@ -307,17 +290,11 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
             </select>
           )}
         </div>
-        <div className="flex gap-1">
-          {battle.myTeam.map((mon, i) => (
-            <PokemonInput
-              key={i}
-              value={mon}
-              onChange={(v) => updateTeamMember("myTeam", i, v)}
-              placeholder={`Pokemon ${i + 1}`}
-              className={INPUT_CLASS}
-            />
-          ))}
-        </div>
+        <TeamInput
+          team={battle.myTeam}
+          onChange={(t) => updateTeam("myTeam", t)}
+          league={battle.league}
+        />
       </div>
 
       {/* Row 3: opponent team + player ID */}
@@ -347,17 +324,11 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
             className="text-[10px] px-1.5 py-0.5 border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600 w-20 shrink-0 ml-auto"
           />
         </div>
-        <div className="flex gap-1">
-          {battle.opponentTeam.map((mon, i) => (
-            <PokemonInput
-              key={i}
-              value={mon}
-              onChange={(v) => updateTeamMember("opponentTeam", i, v)}
-              placeholder={`Pokemon ${i + 1}`}
-              className={INPUT_CLASS}
-            />
-          ))}
-        </div>
+        <TeamInput
+          team={battle.opponentTeam}
+          onChange={(t) => updateTeam("opponentTeam", t)}
+          league={battle.league}
+        />
       </div>
     </div>
   );

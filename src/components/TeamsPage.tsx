@@ -1,13 +1,11 @@
 import { useState } from "react";
 import type { SavedTeam } from "../types";
-import { PokemonInput } from "./PokemonInput";
+import { TeamInput } from "./TeamInput";
 import { LeagueNameBadge } from "./LeagueBadge";
 import { LEAGUE_SCHEDULES } from "../leagues";
 
 const UNIQUE_LEAGUES = [...new Set(LEAGUE_SCHEDULES.map((l) => l.name))].sort();
 
-const INPUT_CLASS =
-  "w-full px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded bg-transparent placeholder:text-gray-300 dark:placeholder:text-gray-600";
 
 interface Props {
   teams: SavedTeam[];
@@ -69,21 +67,7 @@ export default function TeamsPage({ teams, onAdd, onUpdate, onDelete }: Props) {
 
           <div className="space-y-1">
             <span className="text-xs text-gray-500 dark:text-gray-400">Pokemon</span>
-            <div className="flex gap-1.5">
-              {newPokemon.map((mon, i) => (
-                <PokemonInput
-                  key={i}
-                  value={mon}
-                  onChange={(v) => {
-                    const next = [...newPokemon] as [string, string, string];
-                    next[i] = v;
-                    setNewPokemon(next);
-                  }}
-                  placeholder={`Pokemon ${i + 1}`}
-                  className={INPUT_CLASS}
-                />
-              ))}
-            </div>
+            <TeamInput team={newPokemon} onChange={setNewPokemon} />
           </div>
 
           <div className="space-y-1">
@@ -220,21 +204,7 @@ function TeamCard({ team, onUpdate, onDelete }: TeamCardProps) {
 
         {/* Pokemon */}
         {editing ? (
-          <div className="flex gap-1.5">
-            {pokemon.map((mon, i) => (
-              <PokemonInput
-                key={i}
-                value={mon}
-                onChange={(v) => {
-                  const next = [...pokemon] as [string, string, string];
-                  next[i] = v;
-                  setPokemon(next);
-                }}
-                placeholder={`Pokemon ${i + 1}`}
-                className={INPUT_CLASS}
-              />
-            ))}
-          </div>
+          <TeamInput team={pokemon} onChange={setPokemon} />
         ) : (
           <div className="flex gap-2 text-sm text-gray-700 dark:text-gray-300">
             {team.pokemon.map((mon, i) => (
