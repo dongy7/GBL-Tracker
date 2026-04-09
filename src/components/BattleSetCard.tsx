@@ -227,7 +227,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
         <select
           value={battle.league}
           onChange={(e) => onUpdate({ league: e.target.value })}
-          className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 min-w-0 flex-1"
+          className="text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-1.5 py-1 min-w-0"
         >
           {availableLeagues.map((l, i) => (
             <option key={i} value={l.name}>
@@ -239,7 +239,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
         <div className="flex gap-1 shrink-0 ml-auto">
           <button
             onClick={() => onUpdate({ result: battle.result === "win" ? null : "win" })}
-            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+            className={`w-7 h-7 rounded text-xs font-bold transition-colors ${
               battle.result === "win"
                 ? "bg-green-500 text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-green-100 dark:hover:bg-green-900"
@@ -249,7 +249,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
           </button>
           <button
             onClick={() => onUpdate({ result: battle.result === "loss" ? null : "loss" })}
-            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+            className={`w-7 h-7 rounded text-xs font-bold transition-colors ${
               battle.result === "loss"
                 ? "bg-red-500 text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-red-100 dark:hover:bg-red-900"
@@ -259,7 +259,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
           </button>
           <button
             onClick={() => onUpdate({ result: battle.result === "draw" ? null : "draw" })}
-            className={`w-8 h-8 rounded text-xs font-bold transition-colors ${
+            className={`w-7 h-7 rounded text-xs font-bold transition-colors ${
               battle.result === "draw"
                 ? "bg-yellow-500 text-white"
                 : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-yellow-100 dark:hover:bg-yellow-900"
@@ -271,7 +271,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
       </div>
 
       {/* Row 2: my team */}
-      <div className="space-y-1 pl-7">
+      <div className="space-y-1 pl-5">
         <div className="flex items-center gap-1.5">
           <span className="text-gray-400 dark:text-gray-500 text-xs shrink-0">Me</span>
           {savedTeams.length > 0 && (
@@ -298,7 +298,7 @@ function BattleRow({ battle, index, availableLeagues, savedTeams, onUpdate }: Ba
       </div>
 
       {/* Row 3: opponent team + player ID */}
-      <div className="space-y-1 pl-7">
+      <div className="space-y-1 pl-5">
         <div className="flex items-center gap-1.5">
           <span className="text-gray-400 dark:text-gray-500 text-xs shrink-0">Opp</span>
           {savedTeams.length > 0 && (
