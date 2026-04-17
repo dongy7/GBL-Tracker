@@ -77,7 +77,7 @@ export function useDay(date: string) {
   );
 
   const previousDayRating = loadPreviousDayRating(date);
-  const canBank = canBankFromPreviousDay(date);
+  const canBank = canBankFromPreviousDay();
 
   const maxSets = getMaxSets(date) + (dayRecord.bankedSet ? 1 : 0);
   const canAddSet = dayRecord.sets.length < maxSets;
