@@ -15,6 +15,10 @@ describe("tierForElo", () => {
     expect(tierForElo(2500)).toBe("Veteran");
   });
 
+  it("returns Expert at 2750", () => {
+    expect(tierForElo(2750)).toBe("Expert");
+  });
+
   it("returns Legend at 3000", () => {
     expect(tierForElo(3000)).toBe("Legend");
   });

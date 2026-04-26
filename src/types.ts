@@ -1,4 +1,4 @@
-export type EloTier = "Ace" | "Veteran" | "Legend";
+export type EloTier = "Ace" | "Veteran" | "Expert" | "Legend";
 
 export interface Rating {
   type: "rank" | "elo";

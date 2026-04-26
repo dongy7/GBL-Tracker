@@ -2,6 +2,7 @@ import type { Rating, EloTier } from "./types";
 
 const TIER_THRESHOLDS: { tier: EloTier; elo: number }[] = [
   { tier: "Legend", elo: 3000 },
+  { tier: "Expert", elo: 2750 },
   { tier: "Veteran", elo: 2500 },
   { tier: "Ace", elo: 2000 },
 ];
@@ -9,7 +10,8 @@ const TIER_THRESHOLDS: { tier: EloTier; elo: number }[] = [
 const TIER_RANK: Record<EloTier, number> = {
   Ace: 1,
   Veteran: 2,
-  Legend: 3,
+  Expert: 3,
+  Legend: 4,
 };
 
 /** Get the tier earned at a given ELO (ignoring history). */

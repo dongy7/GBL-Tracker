@@ -12,6 +12,7 @@ interface EloChartProps {
 const TIER_LINES = [
   { elo: 2000, label: "Ace" },
   { elo: 2500, label: "Veteran" },
+  { elo: 2750, label: "Expert" },
   { elo: 3000, label: "Legend" },
 ];
 
